@@ -39,6 +39,11 @@
       color: var(--ink);
       font-family: Arial, "Malgun Gothic", sans-serif;
       line-height: 1.45;
+      color-scheme: light;
+    }
+
+    body.dark {
+      color-scheme: dark;
     }
 
     .app {
@@ -85,10 +90,13 @@
     }
 
     select {
+      appearance: none;
+      -webkit-appearance: none;
       width: 100%;
       border: 1px solid var(--line);
       background: #fff;
       color: var(--ink);
+      -webkit-text-fill-color: var(--ink);
       min-height: 40px;
       padding: 8px 10px;
       font-size: 15px;
@@ -98,10 +106,13 @@
     body.dark select {
       background: #111827;
       color: var(--ink);
+      -webkit-text-fill-color: var(--ink);
     }
 
     .card {
       background: var(--paper);
+      color: var(--ink);
+      -webkit-text-fill-color: var(--ink);
       border: 1px solid var(--line);
       margin-bottom: 12px;
       padding: 15px;
@@ -140,6 +151,8 @@
 
     .question {
       background: var(--soft);
+      color: var(--ink);
+      -webkit-text-fill-color: var(--ink);
       border: 1px solid var(--line);
       padding: 13px;
       border-radius: 8px;
@@ -186,6 +199,8 @@
 
     .story {
       background: #fbfcfd;
+      color: var(--ink);
+      -webkit-text-fill-color: var(--ink);
       border-left: 4px solid var(--accent);
       border-radius: 0 8px 8px 0;
     }
@@ -203,6 +218,8 @@
     .script {
       border: 1px solid var(--line);
       border-radius: 8px;
+      color: var(--ink);
+      -webkit-text-fill-color: var(--ink);
     }
 
     .script-tools {
@@ -238,6 +255,8 @@
 
     .step {
       background: var(--soft);
+      color: var(--ink);
+      -webkit-text-fill-color: var(--ink);
       border: 1px solid var(--line);
       padding: 10px;
       min-height: 82px;
@@ -300,7 +319,8 @@
 
     @media (max-width: 760px) {
       body {
-        background: #fff;
+        background: var(--bg);
+        color: var(--ink);
       }
 
       .app {
