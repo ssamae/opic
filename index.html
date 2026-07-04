@@ -325,10 +325,6 @@
       display: none;
     }
 
-    .js-ok .compat-fallback {
-      display: none;
-    }
-
     .survey-list {
       margin: 0;
       padding-left: 22px;
@@ -463,44 +459,6 @@
         </select>
       </div>
       <button class="mode-button" id="modeButton" type="button" onclick="toggleDarkMode()">Dark</button>
-    </section>
-
-    <section class="compat-fallback" style="background:#ffffff;color:#111827;padding:14px;margin:10px 0;border:1px solid #d1d5db;font-family:Arial,'Malgun Gothic',sans-serif;line-height:1.55;">
-      <h2 style="margin:0 0 10px;font-size:20px;color:#111827;">OPIC IM3 Practice</h2>
-      <p style="margin:0 0 10px;color:#374151;">카톡 브라우저에서 화면이 비어 보이면 이 백업 화면으로 먼저 확인하세요.</p>
-      <h3 style="margin:14px 0 8px;font-size:17px;color:#111827;">Survey Guide</h3>
-      <ol style="margin:0 0 14px;padding-left:22px;color:#111827;">
-        <li>일 경험 없음</li>
-        <li>학생 아님</li>
-        <li>수강 후 5년 이상 지남</li>
-        <li>개인 주택이나 아파트에 홀로 거주</li>
-        <li>영화 감상</li>
-        <li>공연 관람</li>
-        <li>쇼핑하기</li>
-        <li>TV 시청하기</li>
-        <li>콘서트 관람하기</li>
-        <li>술집이나 바에 가기</li>
-        <li>카페나 커피 전문점 가기</li>
-        <li>음악 감상</li>
-        <li>운동을 전혀 하지 않음</li>
-        <li>국내 여행</li>
-        <li>해외 여행</li>
-        <li>집에서 보내는 휴가</li>
-      </ol>
-      <h3 style="margin:14px 0 8px;font-size:17px;color:#111827;">Music Sample</h3>
-      <p style="margin:0 0 8px;color:#111827;">나는 팝 음악을 가장 좋아한다.</p>
-      <p style="margin:0 0 8px;color:#111827;">듣기 편해서 좋아한다.</p>
-      <p style="margin:0 0 8px;color:#111827;">나는 보통 퇴근 후에 음악을 듣는다.</p>
-      <p style="margin:0 0 8px;color:#111827;">내가 가장 좋아하는 가수는 아이유다.</p>
-      <p style="margin:0 0 8px;color:#111827;">그녀의 노래는 나를 편하게 해준다.</p>
-      <p style="margin:0 0 8px;color:#111827;">그래서 나는 팝 음악을 정말 좋아한다.</p>
-      <hr style="border:0;border-top:1px solid #d1d5db;margin:12px 0;">
-      <p style="margin:0 0 8px;color:#111827;">I like pop music the most.</p>
-      <p style="margin:0 0 8px;color:#111827;">I like it because it is easy to listen to.</p>
-      <p style="margin:0 0 8px;color:#111827;">I usually listen to music after work.</p>
-      <p style="margin:0 0 8px;color:#111827;">My favorite singer is IU.</p>
-      <p style="margin:0 0 8px;color:#111827;">Her songs help me relax.</p>
-      <p style="margin:0;color:#111827;">So, I really like pop music.</p>
     </section>
 
     <section class="card">
@@ -1119,8 +1077,16 @@
     }
 
     function setPlaybackMode(mode) {
-      questionPlayButton.classList.toggle("is-playing", mode === "question");
-      answerPlayButton.classList.toggle("is-playing", mode === "answer");
+      if (mode === "question") {
+        questionPlayButton.classList.add("is-playing");
+      } else {
+        questionPlayButton.classList.remove("is-playing");
+      }
+      if (mode === "answer") {
+        answerPlayButton.classList.add("is-playing");
+      } else {
+        answerPlayButton.classList.remove("is-playing");
+      }
       questionPlayButton.textContent = mode === "question" ? "Stop Question" : "Play Question";
       answerPlayButton.textContent = mode === "answer" ? "Stop Answer" : "Play Answer";
     }
@@ -1179,15 +1145,19 @@
       answerLoop = false;
       clearTimeout(questionLoopTimer);
       clearTimeout(answerLoopTimer);
-      window.speechSynthesis.cancel();
+      if (window.speechSynthesis && window.speechSynthesis.cancel) {
+        window.speechSynthesis.cancel();
+      }
       setPlaybackMode(null);
     }
 
     categorySelect.addEventListener("change", fillTopics);
     topicSelect.addEventListener("change", renderLesson);
-    window.speechSynthesis.onvoiceschanged = function () {
-      window.speechSynthesis.getVoices();
-    };
+    if (window.speechSynthesis && window.speechSynthesis.getVoices) {
+      window.speechSynthesis.onvoiceschanged = function () {
+        window.speechSynthesis.getVoices();
+      };
+    }
 
     fillCategories();
     fillTopics();
@@ -1196,7 +1166,6 @@
     } catch (error) {
       applyTheme("light");
     }
-    document.body.className += " js-ok";
   </script>
 </body>
 </html>
