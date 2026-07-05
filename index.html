@@ -1591,7 +1591,7 @@
         experience: ["Well, I remember one time. ", "Actually, ", "At that moment, ", "So, yeah, "],
         issue: ["Well, these days, ", "I think, ", "To be honest, ", "So, in my opinion, "],
         roleAsk: ["Hi, well, ", "First of all, ", "Also, ", "And one more thing, "],
-        roleSolve: ["Well, there is a problem. ", "To be honest, ", "If possible, ", "So, could you please "],
+        roleSolve: ["Well, there is a problem. ", "To be honest, ", "If possible, ", "So, "],
         rolePast: ["Well, I remember a similar situation. ", "Actually, ", "At first, ", "So, since then, "]
       };
       var chosen = sets.basic;
@@ -1607,12 +1607,351 @@
         chosen = sets.experience;
       }
 
-      lesson.script[0] = chosen[0] + lesson.script[0].charAt(0).toLowerCase() + lesson.script[0].slice(1);
-      if (lesson.script[1]) lesson.script[1] = chosen[1] + lesson.script[1].charAt(0).toLowerCase() + lesson.script[1].slice(1);
-      if (lesson.script[3]) lesson.script[3] = chosen[2] + lesson.script[3].charAt(0).toLowerCase() + lesson.script[3].slice(1);
+      lesson.script[0] = chosen[0] + lesson.script[0];
+      if (lesson.script[1]) lesson.script[1] = chosen[1] + lesson.script[1];
+      if (lesson.script[3]) lesson.script[3] = chosen[2] + lesson.script[3];
       var lastIndex = lesson.script.length - 1;
-      if (lastIndex >= 4) lesson.script[lastIndex] = chosen[3] + lesson.script[lastIndex].charAt(0).toLowerCase() + lesson.script[lastIndex].slice(1);
+      if (lastIndex >= 4) lesson.script[lastIndex] = chosen[3] + lesson.script[lastIndex];
       lesson.memory = lesson.script.slice(0, 4);
+    }
+
+    function setQuestionAwareAnswer(lesson, story, script, tips) {
+      lesson.story = story;
+      lesson.script = script;
+      lesson.memory = script.slice(0, 4);
+      if (tips) lesson.tips = tips;
+    }
+
+    function applyQuestionRequirements(lesson, info, profile) {
+      var q = lowerText(lesson.question);
+      var topicName = displayTopicName(lesson);
+
+      if (lesson.category === "Role Play") {
+        if (q.indexOf("new device") >= 0) {
+          setQuestionAwareAnswer(lesson, ["친구에게 새 전자기기에 대해 물어본다.", "어떤 모델이 좋은지 묻는다.", "가격과 기능도 확인한다.", "어디서 사는 것이 좋은지 묻는다.", "마지막에는 추천을 부탁한다."], ["Hi, I am thinking about buying a new device.", "Which model do you recommend?", "How much is it?", "What features are useful?", "Where should I buy it?", "Please give me your recommendation."], ["유형: 질문하기", "질문 요구사항: 친구에게 전자기기 관련 질문 3~4개를 한다."]);
+          return;
+        }
+        if (q.indexOf("ticket office") >= 0 || q.indexOf("buying tickets") >= 0) {
+          setQuestionAwareAnswer(lesson, ["티켓 사무실에 전화해서 표를 물어본다.", "좌석이 있는지 확인한다.", "시간과 가격을 물어본다.", "할인이 있는지도 묻는다.", "마지막에는 예매 방법을 확인한다."], ["Hello, I am calling about tickets.", "Are there any seats available?", "What time does it start?", "How much is one ticket?", "Is there any discount?", "How can I book the tickets?"], ["유형: 질문하기", "질문 요구사항: 티켓 구매 질문을 3~4개 한다."]);
+          return;
+        }
+        if (q.indexOf("hotel") >= 0 && q.indexOf("making a reservation") >= 0) {
+          setQuestionAwareAnswer(lesson, ["호텔에 전화해서 예약 정보를 물어본다.", "방이 있는지 확인한다.", "가격과 날짜를 물어본다.", "조식이 포함되는지도 묻는다.", "마지막에는 예약 방법을 확인한다."], ["Hello, I am calling about a hotel reservation.", "Do you have a room available this Saturday?", "How much is one night?", "Is breakfast included?", "Can I check in early?", "How can I make a reservation?"], ["유형: 질문하기", "질문 요구사항: 호텔 예약 질문을 한다."]);
+          return;
+        }
+        if (q.indexOf("invite") >= 0 && q.indexOf("gathering") >= 0) {
+          setQuestionAwareAnswer(lesson, ["친구를 모임에 초대한다.", "시간이 되는지 묻는다.", "장소와 시간을 알려 준다.", "올 수 있는지 확인한다.", "마지막에는 답을 부탁한다."], ["Hi, I am planning a small gathering.", "Are you free this Saturday?", "We will meet at a restaurant near my house.", "Can you come around seven?", "You do not need to bring anything.", "Please let me know if you can come."], ["유형: 질문하기", "질문 요구사항: 친구 초대, 시간, 장소, 참석 가능 여부를 말한다."]);
+          return;
+        }
+        if (q.indexOf("real estate") >= 0 || q.indexOf("apartment") >= 0 && q.indexOf("ask questions") >= 0) {
+          setQuestionAwareAnswer(lesson, ["부동산에 전화해서 아파트를 물어본다.", "월세와 관리비를 확인한다.", "위치와 지하철 거리를 묻는다.", "방을 볼 수 있는지도 확인한다.", "마지막에는 다른 옵션도 부탁한다."], ["Hello, I am calling about an apartment.", "How much is the rent?", "How much is the maintenance fee?", "Is it close to a subway station?", "Can I see the room this weekend?", "Please send me other options too."], ["유형: 질문하기", "질문 요구사항: 아파트 가격, 위치, 방문 가능 여부를 묻는다."]);
+          return;
+        }
+        if (q.indexOf("travel agency") >= 0 && q.indexOf("ask about") >= 0) {
+          setQuestionAwareAnswer(lesson, ["여행사에 전화해서 여행 상품을 물어본다.", "가능한 날짜를 확인한다.", "가격과 포함 사항을 묻는다.", "호텔과 항공이 포함되는지도 확인한다.", "마지막에는 자료를 보내 달라고 한다."], ["Hello, I am calling about a travel package.", "What dates are available?", "How much is the package?", "Are the hotel and flight included?", "Do you have a similar cheaper package?", "Please send me the details."], ["유형: 질문하기", "질문 요구사항: 여행 상품 날짜, 가격, 포함 사항을 묻는다."]);
+          return;
+        }
+        if (q.indexOf("give directions") >= 0 || q.indexOf("cannot find your house") >= 0) {
+          setQuestionAwareAnswer(lesson, ["친구가 우리 집을 찾지 못하고 있다.", "먼저 당황하지 말라고 한다.", "근처 편의점이 보이는지 묻는다.", "우리 아파트는 그 편의점 옆이라고 설명한다.", "어려우면 내가 역으로 나가겠다고 말한다."], ["Don't worry. I can help you.", "Can you see a convenience store near you?", "My apartment is next to that store.", "Please walk straight for two more minutes.", "If it is still hard, I will come to the station.", "Please stay on the phone."], ["유형: 문제 해결", "질문 요구사항: 길 안내 문제를 해결한다."]);
+          return;
+        }
+        if (q.indexOf("rental car") >= 0) {
+          setQuestionAwareAnswer(lesson, ["렌터카 회사에 전화해서 차를 물어본다.", "차가 있는지 확인한다.", "가격과 보험을 묻는다.", "픽업 시간도 확인한다.", "마지막에는 예약 방법을 묻는다."], ["Hello, I am calling about renting a car.", "Do you have a small car available this weekend?", "How much is it per day?", "Is insurance included?", "Where can I pick it up?", "How can I make a reservation?"], ["유형: 질문하기", "질문 요구사항: 렌터카 가능 여부, 가격, 보험, 픽업을 묻는다."]);
+          return;
+        }
+        if (q.indexOf("bank") >= 0 || q.indexOf("card") >= 0) {
+          setQuestionAwareAnswer(lesson, ["카드에 문제가 생겨 은행에 전화한다.", "결제가 되지 않는다고 말한다.", "계좌나 카드 상태를 확인해 달라고 한다.", "필요하면 카드를 정지해 달라고 말한다.", "마지막에는 해결 방법을 묻는다."], ["Hello, there is a problem with my card.", "My card is not working right now.", "Can you check my card status?", "If there is a serious problem, please block the card.", "I am a little worried about it.", "Please let me know what I should do."], ["유형: 문제 해결", "질문 요구사항: 카드 문제를 설명하고 해결을 요청한다."]);
+          return;
+        }
+        if (q.indexOf("watching your relative") >= 0) {
+          setQuestionAwareAnswer(lesson, ["친척 집을 봐주다가 문제가 생겼다.", "창문이 잘 닫히지 않는다고 말한다.", "나는 조금 걱정된다고 말한다.", "수리 기사에게 연락해도 되는지 묻는다.", "마지막에는 어떻게 할지 확인한다."], ["There is a problem at your house.", "The window does not close well.", "I am a little worried about it.", "Can I call a repair person?", "I will stay here and check the house.", "Please let me know what I should do."], ["유형: 문제 해결", "질문 요구사항: 집 봐주기 중 생긴 문제를 설명한다."]);
+          return;
+        }
+        if (q.indexOf("bought something") >= 0 && q.indexOf("problem") >= 0) {
+          setQuestionAwareAnswer(lesson, ["산 물건에 문제가 있어서 가게에 전화한다.", "사이즈가 맞지 않거나 제품에 문제가 있다고 말한다.", "교환이나 환불이 가능한지 묻는다.", "영수증이 있다고 말한다.", "마지막에는 방문 시간을 확인한다."], ["Hello, there is a problem with the product I bought.", "The size is wrong, and I want to exchange it.", "Can I exchange or return it?", "I have the receipt with me.", "When can I visit the store?", "Please let me know what I should do."], ["유형: 문제 해결", "질문 요구사항: 구매 문제와 교환/환불 요청을 말한다."]);
+          return;
+        }
+        if (q.indexOf("ticket reservation") >= 0) {
+          setQuestionAwareAnswer(lesson, ["티켓 예매에 문제가 생겼다.", "결제는 되었지만 확인 문자를 받지 못했다.", "예약 번호를 확인해 달라고 한다.", "필요하면 다른 시간이나 좌석도 괜찮다고 말한다.", "마지막에는 해결 방법을 묻는다."], ["There is a problem with my ticket reservation.", "I paid for the ticket, but I did not get a confirmation message.", "Can you check my reservation number?", "If there is no seat, I can choose another time or seat.", "I am a little worried about it.", "Please let me know what I should do."], ["유형: 문제 해결", "질문 요구사항: 티켓 예매 문제와 대안을 말한다."]);
+          return;
+        }
+        if (q.indexOf("hotel reservation") >= 0) {
+          setQuestionAwareAnswer(lesson, ["호텔 예약에 문제가 생겼다.", "예약 날짜가 잘못된 것 같다고 말한다.", "원래 원하는 날짜를 말한다.", "날짜 변경이나 다른 방이 가능한지 묻는다.", "마지막에는 추가 비용을 확인한다."], ["There is a problem with my hotel reservation.", "The date seems to be wrong.", "I wanted to stay this Saturday.", "Can you change the date for me?", "If that room is not available, another room type is okay.", "Is there any extra charge?"], ["유형: 문제 해결", "질문 요구사항: 호텔 예약 문제와 대안을 말한다."]);
+          return;
+        }
+        if (q.indexOf("gathering") >= 0 && q.indexOf("problem") >= 0) {
+          setQuestionAwareAnswer(lesson, ["모임 일정에 문제가 생겼다.", "갑자기 일이 생겨 제시간에 갈 수 없다고 말한다.", "먼저 미안하다고 사과한다.", "조금 늦게 가거나 다른 날 만나는 것을 제안한다.", "마지막에는 친구의 의견을 묻는다."], ["I am really sorry, but there is a problem.", "Something came up, so I cannot arrive on time.", "Can I come a little later?", "Or we can meet another day if you want.", "I am sorry again about this.", "Please let me know what works for you."], ["유형: 문제 해결", "질문 요구사항: 모임 문제와 대안을 말한다."]);
+          return;
+        }
+        if (q.indexOf("travel package") >= 0) {
+          setQuestionAwareAnswer(lesson, ["여행 상품에 문제가 생겼다.", "원하는 날짜에 자리가 없다고 들었다.", "다른 날짜가 가능한지 묻는다.", "비슷한 가격의 다른 상품도 괜찮다고 말한다.", "마지막에는 가능한 옵션을 보내 달라고 한다."], ["There is a problem with the travel package.", "I heard there are no seats on the date I want.", "Is another date available?", "A different package with a similar price is okay.", "Changing the hotel or flight time is also okay.", "Please send me available options."], ["유형: 문제 해결", "질문 요구사항: 여행 상품 문제와 대안을 말한다."]);
+          return;
+        }
+      }
+
+      if (topicName === "음악" && q.indexOf("favorite singer") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 팝 음악을 가장 좋아한다.",
+          "듣기 편하고 스트레스를 줄여 주기 때문이다.",
+          "내가 가장 좋아하는 가수는 아이유다.",
+          "아이유의 목소리는 부드럽고 편안하다.",
+          "그녀의 노래를 들으면 기분이 좋아진다.",
+          "그래서 나는 팝 음악과 아이유를 가장 좋아한다."
+        ], [
+          "I like pop music the most.",
+          "It is easy to listen to, and it helps me reduce stress.",
+          "My favorite singer is IU.",
+          "Her voice is soft and comfortable.",
+          "When I listen to her songs, I feel much better.",
+          "That is why I like pop music and IU the most."
+        ], ["유형: 묘사 / 루틴", "질문 요구사항: 좋아하는 음악 종류와 좋아하는 가수를 모두 답한다.", "가수는 IU 한 명으로 고정한다.", "이유와 감정은 relax, feel better로 짧게 말한다."]);
+        return;
+      }
+
+      if (topicName === "음악" && q.indexOf("when and where") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 시간이 있을 때 음악을 자주 듣는다.",
+          "보통 출근할 때나 산책할 때 듣는다.",
+          "스마트폰이 있어서 어디서든 들을 수 있다.",
+          "음악을 들으면 스트레스가 줄어든다.",
+          "그리고 기분도 훨씬 좋아진다.",
+          "그래서 음악은 내 일상에서 중요한 부분이다."
+        ], [
+          "I listen to music whenever I have time.",
+          "I usually listen to it on my way to work or when I take a walk.",
+          "With my smartphone, I can listen to music anywhere.",
+          "Music helps me reduce stress.",
+          "It also makes me feel much better.",
+          "So, music is an important part of my daily life."
+        ], ["유형: 묘사 / 루틴", "질문 요구사항: 언제, 어디서, 왜 듣는지 모두 답한다.", "장소는 commute와 walk로 고정한다.", "이유는 stress와 mood로 간다."]);
+        return;
+      }
+
+      if (topicName === "음악" && q.indexOf("first get interested") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "어렸을 때 나는 아이돌 음악을 많이 들었다.",
+          "친구들이 좋아해서 나도 자연스럽게 관심이 생겼다.",
+          "그때는 신나는 노래를 좋아했다.",
+          "하지만 지금은 기분에 따라 여러 음악을 듣는다.",
+          "피곤할 때는 조용한 음악을 듣고, 걸을 때는 신나는 음악을 듣는다.",
+          "그래서 내 음악 취향은 예전보다 많이 넓어졌다."
+        ], [
+          "When I was young, I listened to idol music a lot.",
+          "I got interested in it because my friends liked it.",
+          "At that time, I liked upbeat songs.",
+          "But now, I listen to many different types of music.",
+          "When I am tired, I listen to quiet music, and when I walk, I listen to upbeat music.",
+          "So, my music taste has become much wider than before."
+        ], ["유형: 과거/현재 비교", "질문 요구사항: 관심 계기, 어릴 때 음악, 현재 음악, 변화까지 답한다.", "과거는 idol music, 현재는 different types로 잡는다."]);
+        return;
+      }
+
+      if (topicName === "음악" && q.indexOf("live music") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "몇 년 전에 친구와 콘서트에 갔다.",
+          "공연장은 사람들로 가득했다.",
+          "분위기는 정말 활기찼다.",
+          "사람들이 노래를 따라 불러서 나도 신났다.",
+          "라이브로 들으니까 음악이 훨씬 감동적이었다.",
+          "그래서 그 콘서트는 아직도 좋은 기억으로 남아 있다."
+        ], [
+          "A few years ago, I went to a concert with my friend.",
+          "The concert hall was full of people.",
+          "The mood was really lively.",
+          "People sang along to the songs, so I felt very excited.",
+          "Listening to the music live was much more touching.",
+          "So, that concert is still a great memory for me."
+        ], ["유형: 경험", "질문 요구사항: 라이브 음악 경험, 분위기, 음악에 대한 느낌을 모두 답한다.", "경험 문제에서만 과거 이야기를 한다."]);
+        return;
+      }
+
+      if (topicName === "음악" && q.indexOf("two different types") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 팝 음악과 발라드를 둘 다 좋아한다.",
+          "둘 다 듣기 편하고 기분을 좋게 해준다.",
+          "하지만 느낌은 조금 다르다.",
+          "팝 음악은 신나고 에너지가 있다.",
+          "발라드는 조용하고 마음을 편하게 해준다.",
+          "그래서 나는 상황에 따라 두 음악을 다르게 듣는다."
+        ], [
+          "I like both pop music and ballads.",
+          "Both are easy to listen to, and they make me feel good.",
+          "But they feel a little different.",
+          "Pop music is exciting and energetic.",
+          "Ballads are quiet, and they help me relax.",
+          "So, I listen to them in different situations."
+        ], ["유형: 비교", "질문 요구사항: 두 종류, 각각의 특징, 공통점과 차이점을 답한다.", "비교 대상은 pop music과 ballads로 고정한다."]);
+        return;
+      }
+
+      if (topicName === "음악" && q.indexOf("gadgets") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "요즘 사람들은 스마트폰으로 음악을 많이 듣는다.",
+          "블루투스 이어폰과 스트리밍 앱도 많이 사용한다.",
+          "이런 기기와 서비스는 정말 편리하다.",
+          "사람들은 언제 어디서나 음악을 들을 수 있다.",
+          "원하는 노래를 쉽게 찾을 수 있어서 좋다.",
+          "그래서 음악을 듣는 방식은 훨씬 편리해졌다."
+        ], [
+          "These days, people listen to music on their smartphones a lot.",
+          "They also use Bluetooth earphones and streaming apps.",
+          "These devices and services are really convenient.",
+          "People can listen to music anytime and anywhere.",
+          "They like them because they can find songs easily.",
+          "So, the way people listen to music has become much more convenient."
+        ], ["유형: 이슈 / 변화", "질문 요구사항: 관심 기기, 유용한 점, 사람들이 좋아하는 이유를 답한다.", "기기는 smartphone, Bluetooth earphones, streaming apps로 고정한다."]);
+        return;
+      }
+
+      if (q.indexOf("what kind of movies") >= 0 || q.indexOf("favorite genre") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 코미디 영화를 가장 좋아한다.",
+          "이해하기 쉽고 재미있기 때문이다.",
+          "코미디 영화를 보면 스트레스가 줄어든다.",
+          "주말에 집에서 자주 본다.",
+          "가끔 친구들과 영화관에서도 본다.",
+          "그래서 나는 기분 전환을 위해 코미디 영화를 본다."
+        ], [
+          "I like comedy movies the most.",
+          "They are easy to understand and fun.",
+          "When I watch comedy movies, I feel less stressed.",
+          "I often watch them at home on weekends.",
+          "Sometimes, I watch them at the theater with my friends.",
+          "So, I watch comedy movies to refresh myself."
+        ], ["유형: 묘사 / 루틴", "질문 요구사항: 좋아하는 장르와 이유를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("what people normally do at bars") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "사람들은 보통 술집에서 친구나 동료를 만난다.",
+          "가벼운 술과 음식을 먹으면서 이야기한다.",
+          "나는 보통 친구들과 술집에 간다.",
+          "우리는 일 이야기와 일상 이야기를 한다.",
+          "나는 술을 많이 마시지는 않지만 분위기를 좋아한다.",
+          "그래서 술집은 사람들과 가까워지는 장소라고 생각한다."
+        ], [
+          "People usually meet friends or coworkers at bars.",
+          "They drink a little and eat some food while talking.",
+          "I usually go there with my friends.",
+          "We talk about work and daily life.",
+          "I am not a heavy drinker, but I like the mood.",
+          "So, I think bars are good places to get closer to people."
+        ], ["유형: 묘사 / 루틴", "질문 요구사항: 사람들이 하는 일, 내가 하는 일, 누구와 가는지 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("who do you normally go with") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 보통 친구들과 그곳에 간다.",
+          "친구들과 가면 편하게 이야기할 수 있다.",
+          "우리는 음식을 먹고 일상 이야기를 한다.",
+          "그 시간이 스트레스를 줄여 준다.",
+          "그래서 나는 혼자보다 친구들과 가는 것을 더 좋아한다."
+        ], [
+          "I usually go there with my friends.",
+          "I like going with them because we can talk comfortably.",
+          "We eat food and talk about daily life.",
+          "That time helps me reduce stress.",
+          "So, I prefer going there with my friends."
+        ]);
+        return;
+      }
+
+      if (q.indexOf("what do you usually do at cafes") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 카페에서 커피를 마시며 쉰다.",
+          "가끔 노트북으로 공부하거나 일을 한다.",
+          "친구를 만나서 이야기할 때도 있다.",
+          "조용한 카페에서는 집중이 잘 된다.",
+          "분위기가 좋아서 마음이 편하다.",
+          "그래서 카페는 나에게 편한 휴식 장소다."
+        ], [
+          "I drink coffee and relax at cafes.",
+          "Sometimes, I study or work on my laptop.",
+          "I also meet my friends and talk there.",
+          "I can focus well in quiet cafes.",
+          "The mood makes me feel comfortable.",
+          "So, cafes are comfortable places for me to rest."
+        ], ["유형: 묘사 / 루틴", "질문 요구사항: 카페에서 보통 하는 일을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("shopping habits") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 주로 온라인으로 쇼핑한다.",
+          "가격을 비교하기 쉽기 때문이다.",
+          "보통 옷이나 생활용품을 산다.",
+          "배송이 빠르면 기분이 좋다.",
+          "가끔 큰 쇼핑몰에도 간다.",
+          "그래서 쇼핑은 나에게 편리한 일상 활동이다."
+        ], [
+          "I usually shop online.",
+          "I like it because it is easy to compare prices.",
+          "I usually buy clothes or daily items.",
+          "When delivery is fast, I feel satisfied.",
+          "Sometimes, I also go to big shopping malls.",
+          "So, shopping is a convenient daily activity for me."
+        ], ["유형: 묘사 / 루틴", "질문 요구사항: 쇼핑 습관, 사는 물건, 이유를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("what does it look like") >= 0 || q.indexOf("describe") >= 0) {
+        var placeKr = profile.ko;
+        var placeEn = profile.en;
+        setQuestionAwareAnswer(lesson, [
+          "내가 말하고 싶은 곳은 " + placeKr + "이다.",
+          "그곳은 깔끔하고 편한 분위기다.",
+          "사람들이 이용하기 쉽고 위치도 괜찮다.",
+          "나는 그곳에 있으면 마음이 편하다.",
+          "그래서 그곳은 기억하기 쉬운 장소다."
+        ], [
+          "I want to talk about " + placeEn + ".",
+          "It has a clean and comfortable mood.",
+          "It is easy for people to use, and the location is good.",
+          "When I am there, I feel comfortable.",
+          "So, it is an easy place for me to remember."
+        ], ["유형: 묘사", "질문 요구사항: 장소나 대상의 모습을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("what do you usually do") >= 0 || q.indexOf("what do you like to do") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 보통 유명한 장소를 먼저 본다.",
+          "사진을 찍고 주변을 걸어 다닌다.",
+          "맛있는 음식도 먹는다.",
+          "가끔 기념품이나 필요한 물건을 산다.",
+          "이런 활동을 하면 기분이 좋아진다.",
+          "그래서 나는 이 시간을 좋아한다."
+        ], [
+          "I usually visit famous places first.",
+          "I take pictures and walk around.",
+          "I also eat good food.",
+          "Sometimes, I buy souvenirs or things I need.",
+          "These activities make me feel good.",
+          "So, I enjoy this time."
+        ], ["유형: 묘사 / 루틴", "질문 요구사항: 보통 하는 일을 구체적으로 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("issues") >= 0 || q.indexOf("problems people have") >= 0 || q.indexOf("concerns") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "요즘 가장 큰 문제는 비용과 스트레스다.",
+          "사람들은 시간과 돈을 많이 써야 할 때 부담을 느낀다.",
+          "이 문제 때문에 일상이 피곤해질 수 있다.",
+          "해결책은 미리 계획하고 작은 선택부터 바꾸는 것이다.",
+          "나는 이런 문제가 현실적이라고 생각한다.",
+          "그래서 사람들은 더 현명하게 준비해야 한다."
+        ], [
+          "These days, one big problem is cost and stress.",
+          "People feel pressure when they need to spend a lot of time and money.",
+          "Because of this problem, daily life can feel tiring.",
+          "A good solution is to plan ahead and make small changes.",
+          "I think this issue is realistic.",
+          "So, people should prepare more wisely."
+        ], ["유형: 이슈 / 의견", "질문 요구사항: 문제, 이유, 해결책을 답한다."]);
+        return;
+      }
     }
 
     function rewriteRolePlayNojam(lesson, info, profile) {
@@ -1723,6 +2062,7 @@
         } else {
           rewriteStandardNojam(lesson, info, profile);
         }
+        applyQuestionRequirements(lesson, info, profile);
         addNaturalFillers(lesson, info);
       }
     }
