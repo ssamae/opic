@@ -483,7 +483,7 @@
           <option>Combo Set</option>
           <option>Role Play</option>
           <option>Advanced</option>
-          <option>Survey Guide</option>
+          <option>가이드</option>
         </select>
       </div>
       <div>
@@ -1091,6 +1091,83 @@
       ["15번", "Advanced - 이슈 / 의견", "14번과 관련된 뉴스, 이슈, 문제점, 해결책, 내 의견을 말한다."]
     ];
 
+    var guideSections = [
+      {
+        title: "서베이 선택",
+        badge: "서베이",
+        note: "시험에서 선택할 항목만 외운다.",
+        rows: surveyChoices.map(function (choice, index) {
+          return [String(index + 1) + "번", choice, ""];
+        })
+      },
+      {
+        title: "시험 구성표",
+        badge: "구성표",
+        note: "1번부터 15번까지 어떤 문제가 나오는지 먼저 잡는다.",
+        rows: typeGuideRows
+      },
+      {
+        title: "문제 유형",
+        badge: "유형",
+        note: "질문을 들으면 먼저 유형부터 판단한다.",
+        rows: [
+          ["묘사", "Describe / What does it look like?", "장소, 대상, 좋아하는 것을 설명한다."],
+          ["루틴", "What do you usually do?", "평소 언제, 어디서, 누구와, 무엇을 하는지 말한다."],
+          ["비교", "How has it changed?", "과거와 현재를 나누고 달라진 점을 말한다."],
+          ["경험", "Memorable / Unforgettable / A time when", "최근 경험, 첫 경험, 잊지 못할 경험을 시간 순서로 말한다."],
+          ["롤플레이 질문", "Ask 3 or 4 questions", "가격, 시간, 장소, 방법을 짧게 질문한다."],
+          ["롤플레이 해결", "Explain the problem and suggest alternatives", "문제를 설명하고 교환, 환불, 변경 같은 해결책을 말한다."],
+          ["이슈 / 의견", "Issue / News / Opinion", "문제점, 이유, 해결책, 내 의견 순서로 말한다."]
+        ]
+      },
+      {
+        title: "난이도 선택",
+        badge: "팁",
+        note: "IM3 목표 기준으로 너무 낮거나 너무 높게 잡지 않는다.",
+        rows: [
+          ["IM3 목표", "5-5 또는 6-6", "답변 길이와 문제 수준을 맞추기 좋다."],
+          ["안전 선택", "너무 낮은 난이도 피하기", "쉬운 문제만 고르면 IM3 이상을 보여주기 어렵다."],
+          ["무리 금지", "너무 높은 난이도 피하기", "문제가 어려워져서 답변이 끊길 수 있다."],
+          ["핵심", "내가 준비한 유형을 안정적으로 말하기", "점수는 어려운 단어보다 자연스러운 구조와 지속성이 중요하다."]
+        ]
+      },
+      {
+        title: "스크립트 준비",
+        badge: "팁",
+        note: "모든 답변은 메인포인트, 이유, 감정, 결론으로 정리한다.",
+        rows: [
+          ["기본 구조", "Main Point - Reason - Feeling - Closing", "먼저 핵심을 말하고 마지막에 다시 핵심으로 닫는다."],
+          ["묘사 / 루틴", "좋아한다 - 이유 - 보통 하는 일 - 감정", "짧은 문장으로 반복해서 말하기 좋다."],
+          ["비교", "In the past - But now - Because of this change", "과거와 현재를 나누면 답변이 길어진다."],
+          ["경험", "When - What happened - Feeling - Lesson", "시간 순서와 감정을 넣으면 자연스럽다."],
+          ["표현 선택", "쉬운 단어 우선", "어려운 표현보다 정확하고 편한 문장이 더 안정적이다."]
+        ]
+      },
+      {
+        title: "공부 순서",
+        badge: "팁",
+        note: "한국어 스토리부터 잡고 영어로 바꾼다.",
+        rows: [
+          ["B", "Background Story", "먼저 한국어로 무슨 말을 할지 정한다."],
+          ["T", "Translation", "정한 스토리를 쉬운 영어 문장으로 바꾼다."],
+          ["S", "Speaking Skill", "한 문장씩 말하고 45초에서 60초로 이어 말한다."],
+          ["반복 방법", "키워드만 보고 말하기", "전체 문장을 계속 읽기보다 흐름을 외운다."]
+        ]
+      },
+      {
+        title: "시험 당일 팁",
+        badge: "팁",
+        note: "문제를 완벽히 이해하지 못해도 준비한 구조로 말한다.",
+        rows: [
+          ["Replay", "문제 파악과 키워드 확인", "다시 듣기는 질문 유형을 잡는 데 쓴다."],
+          ["예측", "2번을 들으면 3번과 4번을 준비", "같은 주제가 세 문제로 이어질 수 있다."],
+          ["롤플레이", "11번을 들으면 12번과 13번 대비", "질문, 문제 해결, 관련 경험으로 이어진다."],
+          ["멈춤 방지", "모르면 아는 구조로 전환", "I think, for example, so 같은 쉬운 연결어로 이어간다."],
+          ["준비물", "신분증 미리 준비", "시험장에서는 말하기 흐름에만 집중한다."]
+        ]
+      }
+    ];
+
     var topicNameMap = {
       "Pub & Bar": "술집/바",
       "Overseas Trip": "해외여행",
@@ -1357,10 +1434,9 @@
       }
       var ordered = [];
       for (var j = 0; j < categories.length; j += 1) {
-        if (categories[j] !== "Survey Guide") ordered.push(categories[j]);
+        if (categories[j] !== "Survey Guide" && categories[j] !== "시험 구성표" && categories[j] !== "가이드") ordered.push(categories[j]);
       }
-      ordered.push("시험 구성표");
-      ordered.push("Survey Guide");
+      ordered.push("가이드");
       return ordered;
     }
 
@@ -1378,15 +1454,17 @@
       var category = categorySelect.value;
       topicSelect.innerHTML = "";
       questionSelect.innerHTML = "";
-      if (category === "Survey Guide" || category === "시험 구성표") {
-        var option = document.createElement("option");
-        option.value = category === "Survey Guide" ? "survey" : "type-guide";
-        option.textContent = category === "Survey Guide" ? "Recommended Survey Choices" : "시험 번호별 문제 유형";
-        topicSelect.appendChild(option);
-        var questionOption = document.createElement("option");
-        questionOption.value = option.value;
-        questionOption.textContent = option.textContent;
-        questionSelect.appendChild(questionOption);
+      if (category === "가이드") {
+        guideSections.forEach(function (section) {
+          var option = document.createElement("option");
+          option.value = section.title;
+          option.textContent = section.title;
+          topicSelect.appendChild(option);
+        });
+        var guideOption = document.createElement("option");
+        guideOption.value = topicSelect.value;
+        guideOption.textContent = "가이드 보기";
+        questionSelect.appendChild(guideOption);
         renderLesson();
         return;
       }
@@ -1417,7 +1495,11 @@
     function fillQuestions() {
       var category = categorySelect.value;
       questionSelect.innerHTML = "";
-      if (category === "Survey Guide" || category === "시험 구성표") {
+      if (category === "가이드") {
+        var guideOption = document.createElement("option");
+        guideOption.value = topicSelect.value;
+        guideOption.textContent = "가이드 보기";
+        questionSelect.appendChild(guideOption);
         renderLesson();
         return;
       }
@@ -1435,10 +1517,18 @@
 
     function currentLesson() {
       var category = categorySelect.value;
-      if (category === "Survey Guide" || category === "시험 구성표") return null;
+      if (category === "가이드") return null;
       var selectedTopic = topicSelect.value;
       var index = Number(questionSelect.value || 0);
       return lessons.filter(function (lesson) { return lesson.category === category && displayTopicName(lesson) === selectedTopic; })[index];
+    }
+
+    function currentGuideSection() {
+      var selectedTopic = topicSelect.value;
+      for (var i = 0; i < guideSections.length; i += 1) {
+        if (guideSections[i].title === selectedTopic) return guideSections[i];
+      }
+      return guideSections[0];
     }
 
     function paragraphList(target, items) {
@@ -1471,10 +1561,11 @@
 
     function renderLesson() {
       stopSpeech();
-      if (categorySelect.value === "시험 구성표") {
-        topicTitle.textContent = "시험 번호별 문제 유형";
-        topicNote.textContent = "";
-        topicBadge.textContent = "구성표";
+      if (categorySelect.value === "가이드") {
+        var section = currentGuideSection();
+        topicTitle.textContent = section.title;
+        topicNote.textContent = section.note || "";
+        topicBadge.textContent = section.badge || "가이드";
         questionArea.classList.add("hidden");
         surveyCard.classList.remove("hidden");
         storyCard.classList.add("hidden");
@@ -1482,39 +1573,17 @@
         tipCard.classList.add("hidden");
         scriptCard.classList.add("hidden");
         memoryCard.classList.add("hidden");
-        surveyCard.querySelector("h3").textContent = "시험 구성표";
+        surveyCard.querySelector("h3").textContent = section.title;
         surveyList.className = "type-guide";
         surveyList.innerHTML = "";
-        typeGuideRows.forEach(function (row) {
+        section.rows.forEach(function (row) {
           var li = document.createElement("li");
           var strong = document.createElement("strong");
           var span = document.createElement("span");
-          strong.textContent = row[0] + " - " + row[1];
-          span.textContent = row[2];
+          strong.textContent = row[1] ? row[0] + " - " + row[1] : row[0];
+          span.textContent = row[2] || "";
           li.appendChild(strong);
-          li.appendChild(span);
-          surveyList.appendChild(li);
-        });
-        return;
-      }
-
-      if (categorySelect.value === "Survey Guide") {
-        topicTitle.textContent = "Recommended Survey Choices";
-        topicNote.textContent = "필요할 때만 확인하는 서베이 선택 목록";
-        topicBadge.textContent = "서베이";
-        questionArea.classList.add("hidden");
-        surveyCard.classList.remove("hidden");
-        storyCard.classList.add("hidden");
-        structureCard.classList.add("hidden");
-        tipCard.classList.add("hidden");
-        scriptCard.classList.add("hidden");
-        memoryCard.classList.add("hidden");
-        surveyCard.querySelector("h3").textContent = "선택할 서베이 항목";
-        surveyList.className = "survey-list";
-        surveyList.innerHTML = "";
-        surveyChoices.forEach(function (choice) {
-          var li = document.createElement("li");
-          li.textContent = choice;
+          if (row[2]) li.appendChild(span);
           surveyList.appendChild(li);
         });
         return;
