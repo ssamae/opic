@@ -1583,6 +1583,38 @@
       return ["유형: 묘사 / 루틴", "메인포인트를 첫 문장에 말한다.", "이유와 감정을 각각 한 문장으로 말한다.", "마지막에 같은 메인포인트를 다시 말한다."];
     }
 
+    function addNaturalFillers(lesson, info) {
+      if (!lesson.script || lesson.script.length < 4) return;
+      var sets = {
+        basic: ["Well, actually, ", "I mean, ", "You know, ", "So, yeah, "],
+        compare: ["Well, let me think. ", "I would say, ", "The thing is, ", "So, overall, "],
+        experience: ["Well, I remember one time. ", "Actually, ", "At that moment, ", "So, yeah, "],
+        issue: ["Well, these days, ", "I think, ", "To be honest, ", "So, in my opinion, "],
+        roleAsk: ["Hi, well, ", "First of all, ", "Also, ", "And one more thing, "],
+        roleSolve: ["Well, there is a problem. ", "To be honest, ", "If possible, ", "So, could you please "],
+        rolePast: ["Well, I remember a similar situation. ", "Actually, ", "At first, ", "So, since then, "]
+      };
+      var chosen = sets.basic;
+      if (lesson.category === "Role Play") {
+        if (info.badge === "11번 유형") chosen = sets.roleAsk;
+        else if (info.badge === "12번 유형") chosen = sets.roleSolve;
+        else chosen = sets.rolePast;
+      } else if (info.badge === "14번 유형" || info.type.indexOf("과거/현재") >= 0) {
+        chosen = sets.compare;
+      } else if (info.badge === "15번 유형") {
+        chosen = sets.issue;
+      } else if (info.type.indexOf("경험") >= 0) {
+        chosen = sets.experience;
+      }
+
+      lesson.script[0] = chosen[0] + lesson.script[0].charAt(0).toLowerCase() + lesson.script[0].slice(1);
+      if (lesson.script[1]) lesson.script[1] = chosen[1] + lesson.script[1].charAt(0).toLowerCase() + lesson.script[1].slice(1);
+      if (lesson.script[3]) lesson.script[3] = chosen[2] + lesson.script[3].charAt(0).toLowerCase() + lesson.script[3].slice(1);
+      var lastIndex = lesson.script.length - 1;
+      if (lastIndex >= 4) lesson.script[lastIndex] = chosen[3] + lesson.script[lastIndex].charAt(0).toLowerCase() + lesson.script[lastIndex].slice(1);
+      lesson.memory = lesson.script.slice(0, 4);
+    }
+
     function rewriteRolePlayNojam(lesson, info, profile) {
       if (info.badge === "11번 유형") {
         lesson.story = ["전화를 걸어 필요한 정보를 물어본다.", "먼저 가능한지 확인한다.", "가격이나 시간도 물어본다.", "문제가 생기면 변경 가능한지도 확인한다.", "마지막에는 답변을 부탁한다."];
@@ -1691,6 +1723,7 @@
         } else {
           rewriteStandardNojam(lesson, info, profile);
         }
+        addNaturalFillers(lesson, info);
       }
     }
 
