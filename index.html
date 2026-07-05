@@ -1585,27 +1585,65 @@
 
     function addNaturalFillers(lesson, info) {
       if (!lesson.script || lesson.script.length < 4) return;
+      var topicName = displayTopicName(lesson);
+      var seed = (topicName.length + lesson.script.length + lesson.question.length) % 4;
       var sets = {
-        basic: ["Well, actually, ", "I mean, ", "", "So, yeah, "],
-        compare: ["Well, ", "I would say, ", "", "Overall, "],
-        experience: ["Well, ", "Actually, ", "", "So, "],
-        issue: ["Well, these days, ", "", "To be honest, ", "So, in my opinion, "],
-        roleAsk: ["", "", "Also, ", ""],
-        roleSolve: ["", "", "If possible, ", ""],
-        rolePast: ["Well, ", "Actually, ", "", ""]
+        basic: [
+          ["Honestly, ", "", "", ""],
+          ["", "For me, ", "", ""],
+          ["", "", "", ""],
+          ["Personally, ", "", "", ""]
+        ],
+        compare: [
+          ["", "", "", "Overall, "],
+          ["In my experience, ", "", "", ""],
+          ["", "", "", ""],
+          ["", "", "", "In the end, "]
+        ],
+        experience: [
+          ["I remember this clearly. ", "", "", ""],
+          ["", "At that time, ", "", ""],
+          ["", "", "", ""],
+          ["", "", "", ""]
+        ],
+        issue: [
+          ["These days, ", "", "", ""],
+          ["", "", "", ""],
+          ["", "", "To be honest, ", ""],
+          ["", "", "", "In my opinion, "]
+        ],
+        roleAsk: [
+          ["", "", "Also, ", ""],
+          ["", "", "", "And one more thing, "],
+          ["", "First, ", "", ""],
+          ["", "", "", ""]
+        ],
+        roleSolve: [
+          ["", "", "Could you ", ""],
+          ["", "The problem is, ", "", ""],
+          ["", "", "If possible, ", ""],
+          ["", "", "", ""]
+        ],
+        rolePast: [
+          ["I remember this clearly. ", "", "", ""],
+          ["", "At that time, ", "", ""],
+          ["Honestly, ", "", "", ""],
+          ["", "", "", ""]
+        ]
       };
-      var chosen = sets.basic;
+      var chosenGroup = sets.basic;
       if (lesson.category === "Role Play") {
-        if (info.badge === "11번 유형") chosen = sets.roleAsk;
-        else if (info.badge === "12번 유형") chosen = sets.roleSolve;
-        else chosen = sets.rolePast;
+        if (info.badge === "11번 유형") chosenGroup = sets.roleAsk;
+        else if (info.badge === "12번 유형") chosenGroup = sets.roleSolve;
+        else chosenGroup = sets.rolePast;
       } else if (info.badge === "14번 유형" || info.type.indexOf("과거/현재") >= 0) {
-        chosen = sets.compare;
+        chosenGroup = sets.compare;
       } else if (info.badge === "15번 유형") {
-        chosen = sets.issue;
+        chosenGroup = sets.issue;
       } else if (info.type.indexOf("경험") >= 0) {
-        chosen = sets.experience;
+        chosenGroup = sets.experience;
       }
+      var chosen = chosenGroup[seed % chosenGroup.length];
 
       function stripRepeatedStart(sentence) {
         return String(sentence || "")
@@ -1613,6 +1651,10 @@
           .replace(/^(These days,\s*)+/i, "")
           .replace(/^(I think,\s*)+/i, "")
           .replace(/^(If possible,\s*)+/i, "")
+          .replace(/^(Also,\s*)+/i, "")
+          .replace(/^(Honestly,\s*)+/i, "")
+          .replace(/^(Personally,\s*)+/i, "")
+          .replace(/^(Overall,\s*)+/i, "")
           .replace(/^(There is a problem\.\s*)+/i, "There is a problem ");
       }
 
@@ -1628,6 +1670,22 @@
       if (lesson.script[3]) lesson.script[3] = lowerAfterFiller(chosen[2], lesson.script[3]);
       var lastIndex = lesson.script.length - 1;
       if (lastIndex >= 4) lesson.script[lastIndex] = lowerAfterFiller(chosen[3], lesson.script[lastIndex]);
+      lesson.script = lesson.script.map(function (sentence) {
+        sentence = String(sentence || "")
+          .replace(/^I remember this clearly\. in the past/i, "I remember this clearly. In the past")
+          .replace(/^I remember this clearly\. In the past,/i, "I remember one time.")
+          .replace(/^Could you can you/i, "Could you")
+          .replace(/^If possible, can you/i, "Could you")
+          .replace(/^For me, it is/i, "For me, it is")
+          .replace(/^people can/i, "People can")
+          .replace(/^shopping is/i, "Shopping is")
+          .replace(/^cafes are/i, "Cafes are")
+          .replace(/^the subway is/i, "The subway is")
+          .replace(/^osaka is/i, "Osaka is")
+          .replace(/^busan is/i, "Busan is")
+          .replace(/^korea has/i, "Korea has");
+        return sentence;
+      });
       lesson.memory = lesson.script.slice(0, 4);
     }
 
