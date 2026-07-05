@@ -804,7 +804,7 @@
         badge: "쇼핑 문제",
         question: "You bought something, but there is a problem. Call the store and explain the situation.",
         story: ["물건을 샀는데 문제가 생겼다.", "가게에 전화해서 상황을 설명한다.", "제품에 문제가 있다고 말한다.", "환불이나 교환이 가능한지 물어본다.", "영수증이 있다고 말한다.", "언제 방문하면 되는지도 확인한다.", "상대방에게 도움을 요청한다.", "화내지 말고 정중하게 말한다.", "마지막에는 답변을 부탁한다.", "이 패턴은 쇼핑 문제에 자주 쓸 수 있다."],
-        script: ["Hello, I am calling about a product I bought.", "There is a problem with it.", "It does not work well.", "I bought it yesterday at your store.", "I still have the receipt.", "Can I exchange it for a new one?", "Or can I get a refund?", "When can I visit the store?", "Please var me know what I should do.", "Thank you for your help."],
+        script: ["Hello, I am calling about a product I bought.", "There is a problem with it.", "It does not work well.", "I bought it yesterday at your store.", "I still have the receipt.", "Can I exchange it for a new one?", "Or can I get a refund?", "When can I visit the store?", "Please let me know what I should do.", "Thank you for your help."],
         memory: ["There is a problem with it.", "I have the receipt.", "Can I exchange it?", "Can I get a refund?"]
       },
       {
@@ -822,7 +822,7 @@
         badge: "모임 / 파티",
         question: "Call your friend and invite him or her to a gathering.",
         story: ["친구를 모임에 초대한다.", "언제 어디서 만나는지 말한다.", "누가 오는지도 알려준다.", "음식이나 분위기에 대해 말한다.", "친구가 올 수 있는지 물어본다.", "시간이 괜찮은지도 확인한다.", "필요하면 다른 시간도 제안한다.", "편하게 오라고 말한다.", "마지막에는 답장을 부탁한다.", "초대 상황은 밝고 자연스럽게 말하면 된다."],
-        script: ["Hi, this is Brian.", "I am having a small gathering this Saturday.", "It will be at my place around 7 p.m.", "Some of our friends will come too.", "We will order food and just hang out.", "Can you join us?", "Is that time okay for you?", "If you are busy, we can meet a little later.", "Please var me know.", "I hope you can come."],
+        script: ["Hi, this is Brian.", "I am having a small gathering this Saturday.", "It will be at my place around 7 p.m.", "Some of our friends will come too.", "We will order food and just hang out.", "Can you join us?", "Is that time okay for you?", "If you are busy, we can meet a little later.", "Please let me know.", "I hope you can come."],
         memory: ["I am having a gathering.", "Can you join us?", "Is that time okay?", "I hope you can come."]
       },
       {
@@ -849,7 +849,7 @@
         badge: "친구 초대",
         question: "Call your friend and give directions to your house.",
         story: ["친구를 집에 초대한다.", "몇 시에 오면 되는지 말한다.", "지하철역에서 내리라고 설명한다.", "역에서 집까지 오는 길을 알려준다.", "길을 찾기 어려우면 전화하라고 말한다.", "간단한 음식을 준비하겠다고 한다.", "편하게 오라고 말한다.", "늦으면 알려달라고 한다.", "마지막에 기다리겠다고 말한다.", "길 안내는 짧고 명확해야 한다."],
-        script: ["Hi, you can come to my place around 6 p.m.", "Take the subway and get off at City Hall Station.", "Use exit number three.", "Walk straight for about five minutes.", "You will see a convenience store on your right.", "My apartment is next to that store.", "If you cannot find it, just call me.", "I will prepare some food.", "var me know if you are late.", "See you soon."],
+        script: ["Hi, you can come to my place around 6 p.m.", "Take the subway and get off at City Hall Station.", "Use exit number three.", "Walk straight for about five minutes.", "You will see a convenience store on your right.", "My apartment is next to that store.", "If you cannot find it, just call me.", "I will prepare some food.", "Let me know if you are late.", "See you soon."],
         memory: ["Get off at City Hall Station.", "Use exit number three.", "Walk straight.", "Just call me."]
       },
       {
@@ -867,7 +867,7 @@
         badge: "은행 / 카드",
         question: "Call the bank and explain a problem with your card.",
         story: ["카드에 문제가 생겨 은행에 전화한다.", "먼저 카드가 작동하지 않는다고 말한다.", "언제 문제가 생겼는지 설명한다.", "카드를 잃어버렸다면 바로 정지해 달라고 한다.", "새 카드를 받을 수 있는지 물어본다.", "얼마나 걸리는지도 확인한다.", "온라인 결제도 가능한지 물어본다.", "도움을 부탁한다.", "마지막에는 다시 확인한다.", "은행 문제는 차분하고 정확하게 말해야 한다."],
-        script: ["Hello, I am calling about my card.", "My card is not working.", "The problem started this morning.", "I could not pay at a store.", "Can you check my card?", "If there is a problem, can I get a new one?", "How long will it take?", "Can I still use online payment?", "Please var me know what I should do.", "Thank you for your help."],
+        script: ["Hello, I am calling about my card.", "My card is not working.", "The problem started this morning.", "I could not pay at a store.", "Can you check my card?", "If there is a problem, can I get a new one?", "How long will it take?", "Can I still use online payment?", "Please let me know what I should do.", "Thank you for your help."],
         memory: ["My card is not working.", "Can you check my card?", "Can I get a new one?", "How long will it take?"]
       },
       {
@@ -970,6 +970,123 @@
       "해외 여행",
       "집에서 보내는 휴가"
     ];
+
+    function lowerText(value) {
+      return String(value || "").toLowerCase();
+    }
+
+    function lessonTypeInfo(lesson) {
+      var topic = lowerText(lesson.topic);
+      var question = lowerText(lesson.question);
+
+      if (lesson.category === "Role Play") {
+        if (question.indexOf("problem") >= 0 || question.indexOf("explain") >= 0 || question.indexOf("card") >= 0) {
+          return { badge: "12번 유형", type: "문제 상황 설명 / 해결책 제시" };
+        }
+        return { badge: "11번 유형", type: "상황에 맞는 질문 3~4개 던지기" };
+      }
+
+      if (lesson.category === "Advanced") {
+        if (topic.indexOf("adv 1") >= 0 || question.indexOf("compare") >= 0 || question.indexOf("different types") >= 0) {
+          return { badge: "14번 유형", type: "Advanced 묘사 / 비교" };
+        }
+        return { badge: "15번 유형", type: "Advanced 이슈 / 변화 / 의견" };
+      }
+
+      if (question.indexOf("first get interested") >= 0 || question.indexOf("changed over the years") >= 0 || topic.indexOf("q2") >= 0) {
+        return { badge: "3/6/9번 유형", type: "루틴 + 과거/현재 비교" };
+      }
+
+      if (question.indexOf("remember") >= 0 || question.indexOf("experience") >= 0 || question.indexOf("a time when") >= 0 || question.indexOf("trip you took") >= 0 || topic.indexOf("q4") >= 0) {
+        return { badge: "4/7/10번 유형", type: "최근 경험 / 잊지 못할 경험" };
+      }
+
+      return { badge: "2/5/8번 유형", type: "묘사 / 루틴" };
+    }
+
+    function buildTips(lesson) {
+      var info = lessonTypeInfo(lesson);
+      var topicName = lesson.topic.split(" - ")[0];
+
+      if (info.badge === "11번 유형") {
+        return [
+          "유형: " + info.type,
+          "첫 문장은 전화 목적을 짧게 말한다.",
+          "질문은 가격, 시간, 장소, 방법 순서로 3~4개만 던진다.",
+          "상대방에게 확인이나 답장을 부탁한다.",
+          "마무리는 Thank you 또는 Please call me back으로 닫는다."
+        ];
+      }
+
+      if (info.badge === "12번 유형") {
+        return [
+          "유형: " + info.type,
+          "첫 문장은 문제가 생겼다고 바로 말한다.",
+          "무슨 일이 있었는지 짧게 설명한다.",
+          "해결책은 교환, 환불, 수리, 새로 구매 중 하나로 제시한다.",
+          "마무리는 what I should do로 도움을 요청한다."
+        ];
+      }
+
+      if (info.badge === "14번 유형") {
+        return [
+          "유형: " + info.type,
+          "두 대상을 먼저 말하고 공통점부터 정리한다.",
+          "차이점은 However 또는 On the other hand로 연결한다.",
+          "어려운 설명보다 easy, convenient, popular 같은 쉬운 단어를 쓴다.",
+          "마무리는 내 의견을 한 문장으로 다시 말한다."
+        ];
+      }
+
+      if (info.badge === "15번 유형") {
+        return [
+          "유형: " + info.type,
+          "현재 문제나 변화를 첫 문장에서 말한다.",
+          "과거와 현재를 비교하면 답변이 길어지기 쉽다.",
+          "이유는 편리함, 가격, 시간, 스트레스 중 하나로 잡는다.",
+          "마무리는 I think 또는 So로 내 의견을 분명히 말한다."
+        ];
+      }
+
+      if (info.type.indexOf("과거/현재") >= 0) {
+        return [
+          "유형: " + info.type,
+          "과거는 In the past 또는 When I was young으로 시작한다.",
+          "현재는 But now로 전환한다.",
+          "차이점은 장소, 방법, 취향 중 하나만 잡는다.",
+          "마무리는 has changed a lot으로 닫는다."
+        ];
+      }
+
+      if (info.type.indexOf("경험") >= 0) {
+        return [
+          "유형: " + info.type,
+          "첫 문장은 언제, 누구와, 어디에 갔는지 말한다.",
+          "중간에는 장소와 분위기를 짧게 묘사한다.",
+          "감정은 excited, comfortable, relaxed 중 하나로 잡는다.",
+          "마무리는 good memory 또는 memorable experience로 닫는다."
+        ];
+      }
+
+      return [
+        "유형: " + info.type,
+        "첫 문장은 " + topicName + "에 대한 메인포인트로 시작한다.",
+        "이유는 because로 짧게 붙인다.",
+        "중간에는 보통 언제, 어디서, 누구와 하는지 말한다.",
+        "마무리는 So로 다시 메인포인트를 말한다."
+      ];
+    }
+
+    function normalizeLessons() {
+      for (var i = 0; i < lessons.length; i += 1) {
+        if (lessons[i].category === "Survey Guide") continue;
+        var info = lessonTypeInfo(lessons[i]);
+        lessons[i].badge = info.badge;
+        if (!lessons[i].tips) {
+          lessons[i].tips = buildTips(lessons[i]);
+        }
+      }
+    }
 
     function applyTheme(theme) {
       var isDark = theme === "dark";
@@ -1104,14 +1221,14 @@
       scriptCard.classList.remove("hidden");
       memoryCard.classList.remove("hidden");
       topicTitle.textContent = lesson.topic;
-      topicNote.textContent = lesson.tips ? lesson.tips[0] : "IM3 목표: 짧은 문장으로 45~60초 말하기";
+      topicNote.textContent = lesson.tips ? lesson.tips[0] : "유형: 기본 답변";
       topicBadge.textContent = lesson.badge;
       questionText.textContent = lesson.question;
       paragraphList(storyBox, lesson.story);
       paragraphList(scriptBox, lesson.script);
       renderStructure(lesson);
       tipBox.innerHTML = "";
-      (lesson.tips || ["유형: 기본 답변", "메인포인트, 이유, 감정, 결론 순서로 말한다."]).forEach(function (item) {
+      (lesson.tips || ["유형: 기본 답변", "첫 문장은 메인포인트로 시작한다.", "이유와 감정을 짧게 말한다.", "마무리는 메인포인트를 다시 말한다."]).forEach(function (item) {
         var tip = document.createElement("li");
         tip.textContent = item;
         tipBox.appendChild(tip);
@@ -1239,6 +1356,7 @@
       };
     }
 
+    normalizeLessons();
     fillCategories();
     fillTopics();
     try {
