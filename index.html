@@ -1586,13 +1586,13 @@
     function addNaturalFillers(lesson, info) {
       if (!lesson.script || lesson.script.length < 4) return;
       var sets = {
-        basic: ["Well, actually, ", "I mean, ", "You know, ", "So, yeah, "],
-        compare: ["Well, let me think. ", "I would say, ", "The thing is, ", "So, overall, "],
-        experience: ["Well, I remember one time. ", "Actually, ", "At that moment, ", "So, yeah, "],
-        issue: ["Well, these days, ", "I think, ", "To be honest, ", "So, in my opinion, "],
-        roleAsk: ["Hi, well, ", "First of all, ", "Also, ", "And one more thing, "],
-        roleSolve: ["Well, there is a problem. ", "To be honest, ", "If possible, ", "So, "],
-        rolePast: ["Well, I remember a similar situation. ", "Actually, ", "At first, ", "So, since then, "]
+        basic: ["Well, actually, ", "I mean, ", "", "So, yeah, "],
+        compare: ["Well, ", "I would say, ", "", "Overall, "],
+        experience: ["Well, ", "Actually, ", "", "So, "],
+        issue: ["Well, these days, ", "", "To be honest, ", "So, in my opinion, "],
+        roleAsk: ["", "", "Also, ", ""],
+        roleSolve: ["", "", "If possible, ", ""],
+        rolePast: ["Well, ", "Actually, ", "", ""]
       };
       var chosen = sets.basic;
       if (lesson.category === "Role Play") {
@@ -1607,11 +1607,27 @@
         chosen = sets.experience;
       }
 
-      lesson.script[0] = chosen[0] + lesson.script[0];
-      if (lesson.script[1]) lesson.script[1] = chosen[1] + lesson.script[1];
-      if (lesson.script[3]) lesson.script[3] = chosen[2] + lesson.script[3];
+      function stripRepeatedStart(sentence) {
+        return String(sentence || "")
+          .replace(/^(So,\s*)+/i, "")
+          .replace(/^(These days,\s*)+/i, "")
+          .replace(/^(I think,\s*)+/i, "")
+          .replace(/^(If possible,\s*)+/i, "")
+          .replace(/^(There is a problem\.\s*)+/i, "There is a problem ");
+      }
+
+      function lowerAfterFiller(prefix, sentence) {
+        sentence = stripRepeatedStart(sentence);
+        if (!prefix) return sentence;
+        if (/^(I|IU|AI|Korea|Osaka|Busan|CGV)\b/.test(sentence)) return prefix + sentence;
+        return prefix + sentence.charAt(0).toLowerCase() + sentence.slice(1);
+      }
+
+      lesson.script[0] = lowerAfterFiller(chosen[0], lesson.script[0]);
+      if (lesson.script[1]) lesson.script[1] = lowerAfterFiller(chosen[1], lesson.script[1]);
+      if (lesson.script[3]) lesson.script[3] = lowerAfterFiller(chosen[2], lesson.script[3]);
       var lastIndex = lesson.script.length - 1;
-      if (lastIndex >= 4) lesson.script[lastIndex] = chosen[3] + lesson.script[lastIndex];
+      if (lastIndex >= 4) lesson.script[lastIndex] = lowerAfterFiller(chosen[3], lesson.script[lastIndex]);
       lesson.memory = lesson.script.slice(0, 4);
     }
 
@@ -1627,6 +1643,45 @@
       var topicName = displayTopicName(lesson);
 
       if (lesson.category === "Role Play") {
+        if (q.indexOf("past experience") >= 0) {
+          if (q.indexOf("device") >= 0) {
+            setQuestionAwareAnswer(lesson, ["예전에 새 전자기기를 살 때 친구에게 물어본 적이 있다.", "나는 어떤 모델이 좋은지 잘 몰랐다.", "친구가 가격과 기능을 비교해 주었다.", "그 도움 덕분에 좋은 제품을 살 수 있었다.", "그 이후로 전자기기를 살 때는 먼저 후기를 확인한다."], ["In the past, I asked my friend about buying a new device.", "I did not know which model was good.", "My friend compared the price and features for me.", "Thanks to his help, I could buy a good product.", "Since then, I check reviews first before buying devices."], ["유형: 관련 과거 경험", "질문 요구사항: 전자기기 구매나 질문 관련 과거 경험을 답한다."]);
+            return;
+          }
+          if (q.indexOf("ticket") >= 0) {
+            setQuestionAwareAnswer(lesson, ["예전에 영화 티켓 예매 문제가 있었다.", "결제는 되었지만 확인 문자를 받지 못했다.", "나는 영화관에 전화해서 예약 번호를 말했다.", "직원이 바로 확인해 주었다.", "그 이후로 예매 후에는 확인 문자를 꼭 확인한다."], ["In the past, I had a movie ticket problem.", "I paid for the ticket, but I did not get a confirmation message.", "I called the theater and gave them my reservation number.", "The worker checked it right away.", "Since then, I always check confirmation messages after booking."], ["유형: 관련 과거 경험", "질문 요구사항: 티켓 문제 과거 경험을 답한다."]);
+            return;
+          }
+          if (q.indexOf("card") >= 0 || q.indexOf("bank") >= 0) {
+            setQuestionAwareAnswer(lesson, ["예전에 카드 결제 문제가 있었다.", "편의점에서 카드를 사용했는데 결제가 되지 않았다.", "나는 바로 은행 고객센터에 전화했다.", "직원이 카드 상태를 확인해 주었다.", "그 이후로 중요한 날에는 다른 카드도 챙긴다."], ["In the past, I had a card payment problem.", "I tried to use my card at a convenience store, but it did not work.", "I called the bank customer service right away.", "The worker checked my card status for me.", "Since then, I carry another card on important days."], ["유형: 관련 과거 경험", "질문 요구사항: 카드/은행 문제 과거 경험을 답한다."]);
+            return;
+          }
+          if (q.indexOf("shopping") >= 0) {
+            setQuestionAwareAnswer(lesson, ["예전에 온라인으로 산 옷에 문제가 있었다.", "사이즈가 생각보다 너무 작았다.", "나는 고객센터에 연락했다.", "다행히 교환을 받을 수 있었다.", "그 이후로 옷을 살 때 사이즈표를 더 자세히 본다."], ["In the past, I had a problem with clothes I bought online.", "The size was much smaller than I expected.", "I contacted customer service.", "Luckily, I could exchange it.", "Since then, I check the size chart more carefully."], ["유형: 관련 과거 경험", "질문 요구사항: 쇼핑 문제 과거 경험을 답한다."]);
+            return;
+          }
+          if (q.indexOf("hotel") >= 0) {
+            setQuestionAwareAnswer(lesson, ["예전에 호텔 예약 날짜를 잘못 선택한 적이 있다.", "여행 전날에야 실수를 알게 되었다.", "나는 바로 호텔에 전화했다.", "직원이 친절하게 날짜를 바꿔 주었다.", "그 이후로 예약 날짜를 항상 두 번 확인한다."], ["In the past, I chose the wrong hotel reservation date.", "I realized it the day before my trip.", "I called the hotel right away.", "The worker kindly changed the date for me.", "Since then, I always check reservation dates twice."], ["유형: 관련 과거 경험", "질문 요구사항: 호텔 예약 문제 과거 경험을 답한다."]);
+            return;
+          }
+          if (q.indexOf("gathering") >= 0) {
+            setQuestionAwareAnswer(lesson, ["예전에 친구 모임에 늦은 적이 있다.", "갑자기 회사 일이 늦게 끝났다.", "나는 친구에게 바로 전화해서 상황을 설명했다.", "친구들은 먼저 식당에 들어가서 기다렸다.", "그 이후로 약속이 있으면 더 일찍 준비한다."], ["In the past, I was late for a gathering.", "My work suddenly finished late.", "I called my friend and explained the situation.", "My friends went into the restaurant first and waited.", "Since then, I prepare earlier when I have plans."], ["유형: 관련 과거 경험", "질문 요구사항: 모임 문제 과거 경험을 답한다."]);
+            return;
+          }
+          if (q.indexOf("finding a place") >= 0) {
+            setQuestionAwareAnswer(lesson, ["예전에 집을 구할 때 어려움이 있었다.", "마음에 드는 집은 월세가 너무 비쌌다.", "나는 부동산에 전화해서 다른 집을 추천받았다.", "며칠 동안 여러 집을 보러 다녔다.", "그 이후로 집을 구할 때 조건을 먼저 정한다."], ["In the past, I had trouble finding a place to live.", "The apartment I liked was too expensive.", "I called a real estate agent and asked for other options.", "I visited several places for a few days.", "Since then, I set clear conditions first."], ["유형: 관련 과거 경험", "질문 요구사항: 집 구하기 관련 과거 경험을 답한다."]);
+            return;
+          }
+          if (q.indexOf("travel agency") >= 0 || q.indexOf("trip package") >= 0) {
+            setQuestionAwareAnswer(lesson, ["예전에 여행 상품을 예약하다가 문제가 있었다.", "원하는 날짜의 상품이 이미 매진이었다.", "나는 여행사에 전화해서 다른 날짜를 물어봤다.", "직원이 비슷한 상품을 추천해 주었다.", "그 이후로 여행은 더 일찍 예약하려고 한다."], ["In the past, I had a problem booking a travel package.", "The package for my date was already sold out.", "I called the travel agency and asked about another date.", "The worker recommended a similar package.", "Since then, I try to book trips earlier."], ["유형: 관련 과거 경험", "질문 요구사항: 여행사/여행 상품 관련 과거 경험을 답한다."]);
+            return;
+          }
+          if (q.indexOf("directions") >= 0 || q.indexOf("house") >= 0) {
+            setQuestionAwareAnswer(lesson, ["예전에 친구가 우리 집을 찾지 못한 적이 있다.", "친구는 다른 출구로 나와서 길을 잃었다.", "나는 전화로 편의점 위치를 알려 주었다.", "그래도 어려워해서 직접 역 앞으로 나갔다.", "그 이후로는 주소와 지도를 미리 보내 준다."], ["In the past, my friend could not find my house.", "He came out of the wrong exit and got lost.", "I told him the location of a convenience store by phone.", "But it was still hard, so I went to the station.", "Since then, I send my address and a map in advance."], ["유형: 관련 과거 경험", "질문 요구사항: 길 안내 관련 과거 경험을 답한다."]);
+            return;
+          }
+        }
+
         if (q.indexOf("new device") >= 0) {
           setQuestionAwareAnswer(lesson, ["친구에게 새 전자기기에 대해 물어본다.", "어떤 모델이 좋은지 묻는다.", "가격과 기능도 확인한다.", "어디서 사는 것이 좋은지 묻는다.", "마지막에는 추천을 부탁한다."], ["Hi, I am thinking about buying a new device.", "Which model do you recommend?", "How much is it?", "What features are useful?", "Where should I buy it?", "Please give me your recommendation."], ["유형: 질문하기", "질문 요구사항: 친구에게 전자기기 관련 질문 3~4개를 한다."]);
           return;
@@ -1659,6 +1714,10 @@
           setQuestionAwareAnswer(lesson, ["렌터카 회사에 전화해서 차를 물어본다.", "차가 있는지 확인한다.", "가격과 보험을 묻는다.", "픽업 시간도 확인한다.", "마지막에는 예약 방법을 묻는다."], ["Hello, I am calling about renting a car.", "Do you have a small car available this weekend?", "How much is it per day?", "Is insurance included?", "Where can I pick it up?", "How can I make a reservation?"], ["유형: 질문하기", "질문 요구사항: 렌터카 가능 여부, 가격, 보험, 픽업을 묻는다."]);
           return;
         }
+        if (q.indexOf("license") >= 0 && q.indexOf("renting a car") >= 0) {
+          setQuestionAwareAnswer(lesson, ["렌터카를 빌리려는데 면허 문제가 생겼다.", "면허증을 집에 두고 왔다고 설명한다.", "모바일 면허증이나 사진으로 가능한지 묻는다.", "안 되면 예약 시간을 늦출 수 있는지 묻는다.", "마지막에는 가능한 방법을 알려 달라고 한다."], ["There is a problem with renting a car.", "I left my driver's license at home.", "Can I use a mobile license or a photo of it?", "If that is not possible, can I change the pickup time?", "I am a little worried about this.", "Please let me know what I should do."], ["유형: 문제 해결", "질문 요구사항: 면허 문제를 설명하고 대안을 제시한다."]);
+          return;
+        }
         if (q.indexOf("bank") >= 0 || q.indexOf("card") >= 0) {
           setQuestionAwareAnswer(lesson, ["카드에 문제가 생겨 은행에 전화한다.", "결제가 되지 않는다고 말한다.", "계좌나 카드 상태를 확인해 달라고 한다.", "필요하면 카드를 정지해 달라고 말한다.", "마지막에는 해결 방법을 묻는다."], ["Hello, there is a problem with my card.", "My card is not working right now.", "Can you check my card status?", "If there is a serious problem, please block the card.", "I am a little worried about it.", "Please let me know what I should do."], ["유형: 문제 해결", "질문 요구사항: 카드 문제를 설명하고 해결을 요청한다."]);
           return;
@@ -1677,6 +1736,10 @@
         }
         if (q.indexOf("hotel reservation") >= 0) {
           setQuestionAwareAnswer(lesson, ["호텔 예약에 문제가 생겼다.", "예약 날짜가 잘못된 것 같다고 말한다.", "원래 원하는 날짜를 말한다.", "날짜 변경이나 다른 방이 가능한지 묻는다.", "마지막에는 추가 비용을 확인한다."], ["There is a problem with my hotel reservation.", "The date seems to be wrong.", "I wanted to stay this Saturday.", "Can you change the date for me?", "If that room is not available, another room type is okay.", "Is there any extra charge?"], ["유형: 문제 해결", "질문 요구사항: 호텔 예약 문제와 대안을 말한다."]);
+          return;
+        }
+        if (q.indexOf("apartment you want to rent") >= 0) {
+          setQuestionAwareAnswer(lesson, ["빌리고 싶은 아파트에 문제가 있다.", "월세가 예산보다 높다고 말한다.", "관리비도 생각보다 비싸다고 설명한다.", "비슷하지만 더 저렴한 집이 있는지 묻는다.", "마지막에는 다른 매물을 보내 달라고 한다."], ["There is a problem with the apartment I want to rent.", "The rent is higher than my budget.", "The maintenance fee is also more expensive than I expected.", "Do you have a similar but cheaper place?", "I prefer a place near a subway station.", "Please send me other options."], ["유형: 문제 해결", "질문 요구사항: 아파트 문제를 설명하고 대안을 요청한다."]);
           return;
         }
         if (q.indexOf("gathering") >= 0 && q.indexOf("problem") >= 0) {
@@ -1893,6 +1956,595 @@
           "Sometimes, I also go to big shopping malls.",
           "So, shopping is a convenient daily activity for me."
         ], ["유형: 묘사 / 루틴", "질문 요구사항: 쇼핑 습관, 사는 물건, 이유를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("describe a cafe you often visit") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 집 근처의 작은 카페에 자주 간다.",
+          "그 카페는 조용하고 깔끔하다.",
+          "창가 자리에 앉으면 분위기가 편하다.",
+          "나는 보통 커피를 마시고 휴대폰을 본다.",
+          "가끔 친구와 만나서 이야기하기도 한다.",
+          "그래서 그 카페는 내가 자주 가는 편한 장소다."
+        ], [
+          "I often visit a small cafe near my house.",
+          "The cafe is quiet and clean.",
+          "When I sit by the window, the mood feels comfortable.",
+          "I usually drink coffee and use my phone there.",
+          "Sometimes, I meet my friend and talk there.",
+          "So, that cafe is a comfortable place I often visit."
+        ], ["유형: 묘사", "질문 요구사항: 자주 가는 카페의 모습과 하는 일을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("stores or shopping places you often go to") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 주로 온라인 쇼핑몰을 이용한다.",
+          "가끔 큰 쇼핑몰에도 간다.",
+          "쇼핑몰에는 옷가게와 식당이 많다.",
+          "한곳에서 여러 물건을 볼 수 있어서 편하다.",
+          "나는 보통 옷이나 생활용품을 산다.",
+          "그래서 쇼핑몰은 편리한 장소라고 생각한다."
+        ], [
+          "I usually use online shopping malls.",
+          "Sometimes, I also go to big shopping malls.",
+          "There are many clothing stores and restaurants there.",
+          "It is convenient because I can see many things in one place.",
+          "I usually buy clothes or daily items.",
+          "So, I think shopping malls are convenient places."
+        ], ["유형: 묘사", "질문 요구사항: 자주 가는 쇼핑 장소와 이유를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("movie theater you went to recently") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "최근에 친구와 CGV 영화관에 갔다.",
+          "우리는 온라인으로 표를 예매했다.",
+          "영화 전에 팝콘과 음료를 샀다.",
+          "영화는 액션 영화였고 정말 재미있었다.",
+          "영화가 끝난 후 근처 식당에서 저녁을 먹었다.",
+          "그날은 편하고 즐거운 하루였다."
+        ], [
+          "Recently, I went to a CGV theater with my friend.",
+          "We booked the tickets online.",
+          "Before the movie, we bought popcorn and drinks.",
+          "The movie was an action movie, and it was really fun.",
+          "After the movie, we had dinner at a nearby restaurant.",
+          "It was a comfortable and enjoyable day."
+        ], ["유형: 경험", "질문 요구사항: 최근 영화관, 영화 전/후에 한 일을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("memorable incident that happened at a coffee shop") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "작년에 카페에서 작은 실수를 한 적이 있다.",
+          "커피를 들고 가다가 테이블에 조금 쏟았다.",
+          "나는 정말 당황했고 직원에게 바로 사과했다.",
+          "직원은 친절하게 괜찮다고 말해 주었다.",
+          "친구와 함께 테이블을 닦았다.",
+          "그 일 이후로 카페에서는 더 조심하게 되었다."
+        ], [
+          "Last year, I made a small mistake at a cafe.",
+          "I spilled some coffee on a table.",
+          "I was really embarrassed, so I apologized to the staff right away.",
+          "The worker was kind and said it was okay.",
+          "My friend and I cleaned the table together.",
+          "Since then, I have been more careful at cafes."
+        ], ["유형: 경험", "질문 요구사항: 카페에서 있었던 기억나는 사건을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("first bar you remember") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "내가 기억하는 첫 술집은 대학교 근처에 있었다.",
+          "작고 편한 분위기의 동네 술집이었다.",
+          "테이블은 많지 않았지만 음식이 맛있었다.",
+          "나는 수업 후 친구들과 자주 갔다.",
+          "그곳에서 이야기하고 웃으면서 스트레스를 풀었다.",
+          "그래서 그 술집은 아직도 좋은 기억으로 남아 있다."
+        ], [
+          "The first bar I remember was near my university.",
+          "It was a small local pub with a comfortable mood.",
+          "There were not many tables, but the food was good.",
+          "I often went there with my friends after class.",
+          "We talked, laughed, and reduced stress there.",
+          "So, that bar is still a good memory for me."
+        ], ["유형: 경험", "질문 요구사항: 처음 기억나는 술집의 모습과 경험을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("natural place you remember visiting") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "예전에 바다가 보이는 곳에 간 적이 있다.",
+          "그곳은 조용하고 경치가 좋았다.",
+          "나는 친구와 해변을 걸으며 사진을 찍었다.",
+          "바람이 시원해서 기분이 편해졌다.",
+          "짧은 방문이었지만 기억에 남았다.",
+          "그래서 그 자연 장소를 아직도 기억한다."
+        ], [
+          "In the past, I visited a place near the ocean.",
+          "It was quiet, and the view was beautiful.",
+          "I walked on the beach with my friend and took pictures.",
+          "The wind was cool, so I felt relaxed.",
+          "It was a short visit, but it was memorable.",
+          "So, I still remember that natural place."
+        ], ["유형: 경험", "질문 요구사항: 기억나는 자연 장소 방문 경험을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("pub or bar you often go to") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 집 근처의 작은 바에 자주 간다.",
+          "그곳은 조용하고 편한 분위기다.",
+          "보통 친구들과 가서 맥주를 마신다.",
+          "우리는 일 이야기와 일상 이야기를 한다.",
+          "그곳에 있으면 스트레스가 줄어든다.",
+          "그래서 나는 그 바를 좋아한다."
+        ], [
+          "I often go to a small bar near my house.",
+          "It is quiet and comfortable.",
+          "I usually go there with my friends and drink beer.",
+          "We talk about work and daily life.",
+          "When I am there, I feel less stressed.",
+          "So, I like that bar."
+        ], ["유형: 묘사 / 루틴", "질문 요구사항: 자주 가는 술집, 분위기, 하는 일을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("overseas trip you remember") >= 0 || q.indexOf("unforgettable experience during an overseas trip") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "몇 년 전에 일본 오사카에 갔다.",
+          "거리가 깨끗했고 음식이 맛있었다.",
+          "친구와 유명한 장소를 보고 사진을 찍었다.",
+          "밤에는 시장에서 현지 음식을 먹었다.",
+          "그 여행은 편하고 즐거웠다.",
+          "그래서 오사카 여행은 아직도 좋은 기억이다."
+        ], [
+          "A few years ago, I went to Osaka, Japan.",
+          "The streets were clean, and the food was delicious.",
+          "I visited famous places with my friend and took pictures.",
+          "At night, we ate local food at a market.",
+          "The trip was comfortable and enjoyable.",
+          "So, my Osaka trip is still a good memory."
+        ], ["유형: 경험", "질문 요구사항: 기억나는 해외여행, 한 일, 느낌을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("countries or cities you have visited") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "내가 기억하는 해외 도시는 일본 오사카다.",
+          "오사카는 깨끗하고 활기찬 도시였다.",
+          "거리에는 맛있는 음식점이 많았다.",
+          "교통도 편리해서 이동하기 쉬웠다.",
+          "특히 밤거리가 밝고 예뻤다.",
+          "그래서 오사카는 다시 가고 싶은 도시다."
+        ], [
+          "One foreign city I remember is Osaka, Japan.",
+          "Osaka was clean and lively.",
+          "There were many good restaurants on the streets.",
+          "Transportation was convenient, so it was easy to move around.",
+          "Especially, the night streets were bright and beautiful.",
+          "So, Osaka is a city I want to visit again."
+        ], ["유형: 묘사", "질문 요구사항: 방문한 나라/도시와 모습을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("places you like to visit in your country") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 국내 여행지 중에서 부산을 좋아한다.",
+          "부산에는 바다와 맛있는 음식이 있다.",
+          "해변을 걸으면 기분이 좋아진다.",
+          "시장에서는 해산물도 먹을 수 있다.",
+          "서울에서 멀지 않아 가기 편하다.",
+          "그래서 부산은 내가 좋아하는 국내 여행지다."
+        ], [
+          "I like Busan among domestic travel places.",
+          "Busan has the ocean and delicious food.",
+          "When I walk on the beach, I feel good.",
+          "I can also eat seafood at local markets.",
+          "It is not too far from Seoul, so it is easy to visit.",
+          "So, Busan is one of my favorite places in Korea."
+        ], ["유형: 묘사", "질문 요구사항: 좋아하는 국내 여행지와 이유를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("domestic trip you took") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "작년에 친구와 부산에 갔다.",
+          "우리는 해변을 걷고 사진을 찍었다.",
+          "시장에서는 해산물을 먹었다.",
+          "날씨가 좋아서 기분이 정말 좋았다.",
+          "짧은 여행이었지만 좋은 휴식이 되었다.",
+          "그래서 그 부산 여행이 기억에 남는다."
+        ], [
+          "Last year, I went to Busan with my friend.",
+          "We walked on the beach and took pictures.",
+          "At a local market, we ate seafood.",
+          "The weather was nice, so I felt really good.",
+          "It was a short trip, but it was a good break.",
+          "So, I still remember that Busan trip."
+        ], ["유형: 경험", "질문 요구사항: 국내여행 경험과 한 일을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("your home") >= 0 && q.indexOf("what does it look like") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 작은 아파트에 산다.",
+          "집은 크지 않지만 편하다.",
+          "거실에는 소파와 TV가 있다.",
+          "내 방에는 책상과 침대가 있다.",
+          "퇴근 후에는 보통 내 방에서 쉰다.",
+          "그래서 내 집은 나에게 가장 편한 장소다."
+        ], [
+          "I live in a small apartment.",
+          "It is not big, but it is comfortable.",
+          "There is a sofa and a TV in the living room.",
+          "In my room, there is a desk and a bed.",
+          "After work, I usually rest in my room.",
+          "So, my home is the most comfortable place for me."
+        ], ["유형: 묘사", "질문 요구사항: 집의 모습과 느낌을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("staying home during vacation") >= 0 || q.indexOf("what you did during your last vacation at home") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 집에서 보내는 휴가를 좋아한다.",
+          "보통 늦게 일어나서 편하게 쉰다.",
+          "영화를 보거나 음악을 듣는다.",
+          "가끔 맛있는 음식을 배달시켜 먹는다.",
+          "밖에 나가지 않아도 조용하고 편하다.",
+          "그래서 집 휴가는 나에게 좋은 휴식이다."
+        ], [
+          "I like spending vacations at home.",
+          "I usually wake up late and rest comfortably.",
+          "I watch movies or listen to music.",
+          "Sometimes, I order good food.",
+          "Even without going outside, it feels quiet and comfortable.",
+          "So, a vacation at home is a good break for me."
+        ], ["유형: 묘사 / 경험", "질문 요구사항: 집에서 휴가 때 하는 일을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("who do you meet when you take vacations at home") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "집에서 휴가를 보낼 때는 보통 가족이나 친구와 연락한다.",
+          "가끔 친구가 집 근처로 온다.",
+          "우리는 커피를 마시거나 음식을 시켜 먹는다.",
+          "밖에 오래 나가지 않아도 즐겁다.",
+          "혼자 있을 때는 영화나 음악을 즐긴다.",
+          "그래서 집 휴가는 편하고 부담이 없다."
+        ], [
+          "When I spend vacation at home, I usually contact my family or friends.",
+          "Sometimes, my friend comes near my house.",
+          "We drink coffee or order food.",
+          "It is fun even without going far outside.",
+          "When I am alone, I enjoy movies or music.",
+          "So, home vacation is comfortable and easy."
+        ], ["유형: 묘사 / 루틴", "질문 요구사항: 집 휴가 때 만나는 사람과 하는 일을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("house or apartment you lived in when you were a child") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "어릴 때 나는 작은 아파트에 살았다.",
+          "집은 크지 않았지만 가족과 지내기 좋았다.",
+          "거실에는 TV와 작은 소파가 있었다.",
+          "내 방에는 책상과 침대가 있었다.",
+          "나는 그 방에서 숙제도 하고 게임도 했다.",
+          "그래서 그 집은 아직도 따뜻한 기억으로 남아 있다."
+        ], [
+          "When I was a child, I lived in a small apartment.",
+          "It was not big, but it was good for my family.",
+          "There was a TV and a small sofa in the living room.",
+          "There was a desk and a bed in my room.",
+          "I did homework and played games there.",
+          "So, that home is still a warm memory for me."
+        ], ["유형: 경험", "질문 요구사항: 어릴 때 살던 집의 모습을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("change you made to your home") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "최근에 내 방 구조를 조금 바꿨다.",
+          "책상을 창문 옆으로 옮겼다.",
+          "방을 더 밝고 넓어 보이게 하고 싶었다.",
+          "침대 위치도 바꿔서 공간이 넓어졌다.",
+          "바꾼 후에 방이 훨씬 깔끔해졌다.",
+          "그래서 지금 내 방이 더 마음에 든다."
+        ], [
+          "Recently, I changed my room a little.",
+          "I moved my desk next to the window.",
+          "I wanted my room to look brighter and wider.",
+          "I also moved my bed, so the room had more space.",
+          "After the change, my room looked much cleaner.",
+          "So, I like my room more now."
+        ], ["유형: 경험", "질문 요구사항: 집에 만든 변화와 이유를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("problem that happened at home") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "지난주에 집에서 작은 문제가 생겼다.",
+          "화장실 전등이 갑자기 켜지지 않았다.",
+          "처음에는 조금 당황했다.",
+          "나는 관리사무소에 바로 연락했다.",
+          "수리 기사님이 와서 전등을 고쳐 주었다.",
+          "그래서 문제가 빨리 해결되어 안심했다."
+        ], [
+          "Last week, I had a small problem at home.",
+          "The bathroom light suddenly did not turn on.",
+          "At first, I was a little worried.",
+          "I called the management office right away.",
+          "A repair person came and fixed the light.",
+          "So, I felt relieved because the problem was solved quickly."
+        ], ["유형: 경험", "질문 요구사항: 집 문제와 해결 방법을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("transportation you usually use") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "나는 보통 지하철을 이용한다.",
+          "지하철은 빠르고 시간도 비교적 정확하다.",
+          "출근할 때 주로 지하철을 탄다.",
+          "교통카드로 쉽게 탈 수 있어서 편하다.",
+          "길이 막히지 않아서 스트레스가 적다.",
+          "그래서 지하철은 내가 가장 자주 쓰는 교통수단이다."
+        ], [
+          "I usually use the subway.",
+          "It is fast, and the time is usually accurate.",
+          "I mostly take it when I go to work.",
+          "It is convenient because I can use a transportation card.",
+          "There is no traffic, so I feel less stressed.",
+          "So, the subway is the transportation I use the most."
+        ], ["유형: 묘사 / 루틴", "질문 요구사항: 자주 이용하는 교통수단을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("trouble with transportation") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "예전에 출근길에 교통 문제가 있었다.",
+          "지하철이 갑자기 지연되었다.",
+          "처음에는 조금 당황했다.",
+          "나는 바로 버스로 갈아탔다.",
+          "회사에는 조금 늦었지만 큰 문제는 없었다.",
+          "그 이후로 중요한 날에는 더 일찍 출발한다."
+        ], [
+          "In the past, I had trouble with transportation on my way to work.",
+          "The subway was suddenly delayed.",
+          "At first, I was a little worried.",
+          "I quickly changed to a bus.",
+          "I was a little late, but it was not a big problem.",
+          "Since then, I leave earlier on important days."
+        ], ["유형: 경험", "질문 요구사항: 교통 문제와 해결 방법을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("geography or landscape in your country") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "한국은 산과 바다가 가까운 나라다.",
+          "도시 근처에도 산이 많다.",
+          "동쪽과 남쪽에는 아름다운 바다가 있다.",
+          "그래서 짧은 시간에도 다양한 자연을 볼 수 있다.",
+          "나는 이런 지형이 편하고 좋다.",
+          "그래서 한국의 자연 풍경을 좋아한다."
+        ], [
+          "Korea has many mountains and the ocean is not too far away.",
+          "There are many mountains near cities.",
+          "There is beautiful ocean on the east and south sides.",
+          "So, people can see different kinds of nature in a short time.",
+          "I think this landscape is convenient and beautiful.",
+          "That is why I like the natural landscape in Korea."
+        ], ["유형: 묘사", "질문 요구사항: 나라의 지형과 풍경을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("important industry in your country") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "한국에서 중요한 산업 중 하나는 기술 산업이다.",
+          "스마트폰과 반도체가 대표적이다.",
+          "이 산업은 많은 사람들의 생활을 편리하게 만든다.",
+          "또 한국 경제에도 큰 도움이 된다.",
+          "새로운 기술을 보면 흥미롭다.",
+          "그래서 나는 기술 산업이 중요하다고 생각한다."
+        ], [
+          "One important industry in Korea is the technology industry.",
+          "Smartphones and semiconductors are good examples.",
+          "This industry makes people's lives more convenient.",
+          "It also helps the Korean economy a lot.",
+          "When I see new technology, I feel interested.",
+          "So, I think the technology industry is very important."
+        ], ["유형: 묘사", "질문 요구사항: 중요한 산업과 이유를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("product that did not meet people's expectations") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "예전에 기대보다 별로였던 전자제품을 본 적이 있다.",
+          "사람들은 배터리가 오래갈 것이라고 기대했다.",
+          "하지만 실제로는 배터리가 빨리 닳았다.",
+          "가격도 비싸서 많은 사람들이 실망했다.",
+          "나는 제품 설명과 실제 성능이 맞아야 한다고 생각한다.",
+          "그래서 그 제품은 좋은 반응을 얻지 못했다."
+        ], [
+          "I remember an electronic product that did not meet people's expectations.",
+          "People expected the battery to last a long time.",
+          "But actually, the battery died quickly.",
+          "The price was also high, so many people were disappointed.",
+          "I think product information should match real performance.",
+          "So, that product did not get a good reaction."
+        ], ["유형: 경험 / 의견", "질문 요구사항: 기대에 못 미친 제품과 이유를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("memorable experience with your friends") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "작년에 친구들과 부산에 갔다.",
+          "우리는 바다를 보고 사진을 많이 찍었다.",
+          "저녁에는 맛있는 음식을 먹으며 이야기했다.",
+          "그날 분위기가 편하고 즐거웠다.",
+          "친구들과 더 가까워진 느낌이 들었다.",
+          "그래서 그 경험은 아직도 좋은 기억이다."
+        ], [
+          "Last year, I went to Busan with my friends.",
+          "We saw the ocean and took many pictures.",
+          "In the evening, we ate good food and talked a lot.",
+          "The mood was comfortable and fun.",
+          "I felt closer to my friends.",
+          "So, that experience is still a good memory for me."
+        ], ["유형: 경험", "질문 요구사항: 친구들과의 기억나는 경험을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("where tourists go and what they do") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "해외여행객들은 보통 유명한 관광지에 간다.",
+          "랜드마크를 보고 사진을 많이 찍는다.",
+          "현지 음식을 먹고 시장도 방문한다.",
+          "기념품을 사거나 쇼핑을 하기도 한다.",
+          "요즘은 여행 앱으로 정보를 쉽게 찾는다.",
+          "그래서 해외여행은 더 즐기기 쉬워졌다."
+        ], [
+          "Tourists usually visit famous landmarks overseas.",
+          "They take many pictures there.",
+          "They also try local food and visit markets.",
+          "Sometimes, they buy souvenirs or go shopping.",
+          "These days, travel apps help them find information easily.",
+          "So, overseas trips are easier to enjoy now."
+        ], ["유형: 이슈 / 묘사", "질문 요구사항: 여행객들이 가는 곳과 하는 일을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("media report") >= 0 && q.indexOf("bars") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "최근에 술집과 관련된 뉴스를 본 적이 있다.",
+          "한 유명한 클럽에서 안전 문제가 생겼다는 내용이었다.",
+          "뉴스에서는 경찰 조사와 영업 규칙을 이야기했다.",
+          "많은 사람들이 그 사건에 실망했다.",
+          "나는 술집이 안전하고 정직하게 운영되어야 한다고 생각한다.",
+          "그래서 그 뉴스가 기억에 남았다."
+        ], [
+          "Recently, I saw a news report about a bar.",
+          "It was about a safety problem at a famous club.",
+          "The report talked about a police investigation and business rules.",
+          "Many people were disappointed by the issue.",
+          "I think bars should be operated safely and honestly.",
+          "So, I remember that news report."
+        ], ["유형: 이슈 / 의견", "질문 요구사항: 술집 관련 미디어 보도와 내 의견을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("parents' generation") >= 0 && q.indexOf("health") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "부모님 세대는 건강을 단순하게 관리했다.",
+          "주로 집밥을 먹고 많이 걸었다.",
+          "지금 사람들은 건강 정보를 쉽게 찾을 수 있다.",
+          "운동 앱이나 건강 검진도 자주 이용한다.",
+          "하지만 스트레스와 앉아 있는 시간은 더 많아졌다.",
+          "그래서 지금은 작은 생활 습관 관리가 더 중요하다."
+        ], [
+          "My parents' generation managed health in a simple way.",
+          "They usually ate home-cooked meals and walked a lot.",
+          "Today, people can easily find health information.",
+          "They also use exercise apps and health checkups.",
+          "However, people have more stress and sit for a long time.",
+          "So, small daily habits are more important now."
+        ], ["유형: 비교", "질문 요구사항: 부모님 세대와 현재 건강관리 차이를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("health problems") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "요즘 사람들은 스트레스와 수면 부족 문제가 많다.",
+          "오래 앉아서 일하기 때문에 몸도 쉽게 피곤해진다.",
+          "이런 문제는 일상생활에 나쁜 영향을 준다.",
+          "사람들은 규칙적으로 걷고 잠을 충분히 자야 한다.",
+          "나도 건강 관리는 작은 습관에서 시작한다고 생각한다.",
+          "그래서 매일 조금씩 관리하는 것이 중요하다."
+        ], [
+          "These days, many people have stress and sleep problems.",
+          "They also get tired easily because they sit for a long time.",
+          "These problems can affect daily life in a bad way.",
+          "People should walk regularly and get enough sleep.",
+          "I think health management starts with small habits.",
+          "So, it is important to take care of health every day."
+        ], ["유형: 이슈 / 의견", "질문 요구사항: 건강 문제와 해결 방법을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("concerns people have related to traveling") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "요즘 여행에서 가장 큰 걱정은 비용이다.",
+          "호텔과 교통비가 많이 올랐다.",
+          "인기 있는 장소는 사람이 너무 많다.",
+          "그래서 여행이 피곤하게 느껴질 때도 있다.",
+          "해결책으로는 비수기에 여행을 가는 것이 좋다.",
+          "또 미리 예약하면 비용을 줄일 수 있다."
+        ], [
+          "These days, one big concern about travel is cost.",
+          "Hotels and transportation have become expensive.",
+          "Popular places are also too crowded.",
+          "So, trips can sometimes feel tiring.",
+          "As a solution, traveling in the off-season is helpful.",
+          "Also, booking early can reduce the cost."
+        ], ["유형: 이슈 / 의견", "질문 요구사항: 여행 관련 걱정과 해결책을 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("shopping changed over the years") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "쇼핑 방식은 예전보다 많이 바뀌었다.",
+          "예전에는 직접 매장에 가서 물건을 샀다.",
+          "하지만 지금은 온라인 쇼핑을 많이 한다.",
+          "가격과 후기를 바로 비교할 수 있어서 편하다.",
+          "배송도 빨라져서 시간이 절약된다.",
+          "그래서 쇼핑은 예전보다 훨씬 편리해졌다."
+        ], [
+          "Shopping has changed a lot over the years.",
+          "In the past, people went to stores and bought things in person.",
+          "But now, many people shop online.",
+          "It is convenient because we can compare prices and reviews right away.",
+          "Delivery has also become faster, so it saves time.",
+          "So, shopping has become much more convenient than before."
+        ], ["유형: 과거/현재 비교", "질문 요구사항: 쇼핑 방식의 과거와 현재 변화를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("traveling today different from traveling in the past") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "여행은 예전보다 훨씬 쉬워졌다.",
+          "예전에는 정보를 찾고 예약하는 데 시간이 오래 걸렸다.",
+          "하지만 지금은 앱으로 호텔과 비행기를 예약할 수 있다.",
+          "지도 앱과 번역 앱도 여행에 도움이 된다.",
+          "그래서 여행 준비가 훨씬 편해졌다.",
+          "나는 이런 변화가 매우 긍정적이라고 생각한다."
+        ], [
+          "Traveling has become much easier than before.",
+          "In the past, finding information and making reservations took a long time.",
+          "But now, people can book hotels and flights with apps.",
+          "Map apps and translation apps also help travelers.",
+          "So, planning a trip has become much more convenient.",
+          "I think this change is very positive."
+        ], ["유형: 과거/현재 비교", "질문 요구사항: 여행의 과거와 현재 차이를 답한다."]);
+        return;
+      }
+
+      if (q.indexOf("coffee shops changed over the years") >= 0) {
+        setQuestionAwareAnswer(lesson, [
+          "카페는 예전보다 더 다양해졌다.",
+          "예전에는 주로 커피를 마시는 곳이었다.",
+          "하지만 지금은 공부하거나 일하는 공간으로도 많이 쓰인다.",
+          "많은 카페에는 와이파이와 콘센트가 있다.",
+          "분위기도 더 세련되고 편해졌다.",
+          "그래서 카페는 일상에서 더 중요한 공간이 되었다."
+        ], [
+          "Coffee shops have become more diverse than before.",
+          "In the past, they were mainly places to drink coffee.",
+          "But now, people also use them to study or work.",
+          "Many cafes have Wi-Fi and outlets.",
+          "The mood has also become more modern and comfortable.",
+          "So, cafes have become more important places in daily life."
+        ], ["유형: 과거/현재 비교", "질문 요구사항: 카페의 과거와 현재 변화를 답한다."]);
         return;
       }
 
