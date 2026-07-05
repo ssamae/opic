@@ -348,6 +348,24 @@
       border-bottom: 1px solid var(--line);
     }
 
+    .type-guide {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 16px;
+    }
+
+    .type-guide li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .type-guide strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
     @media (max-width: 760px) {
       body {
         background: var(--bg);
@@ -970,12 +988,56 @@
       "집에서 보내는 휴가"
     ];
 
+    var typeGuideRows = [
+      ["1번", "자기소개", "내 이름, 사는 곳, 하는 일, 성격을 짧게 말한다."],
+      ["2/5/8번", "묘사 / 루틴", "장소, 대상, 평소 하는 일을 설명한다."],
+      ["3/6/9번", "루틴 + 과거/현재 비교", "예전과 지금이 어떻게 달라졌는지 비교한다."],
+      ["4/7/10번", "최근 경험 / 잊지 못할 경험", "언제, 어디서, 누구와, 무슨 일이 있었는지 말한다."],
+      ["11번", "상황에 맞는 질문 3~4개 던지기", "가격, 시간, 장소, 방법 등을 질문한다."],
+      ["12번", "문제 상황 설명 / 해결책 제시", "문제를 설명하고 교환, 환불, 수리, 대안을 제시한다."],
+      ["13번", "11/12번 관련 과거 경험", "비슷한 문제가 있었던 과거 경험을 말한다."],
+      ["14번", "Advanced 묘사 / 루틴 / 비교", "두 대상이나 과거와 현재를 비교한다."],
+      ["15번", "Advanced 이슈 / 뉴스 / 의견", "사회적 변화, 문제, 해결책, 내 의견을 말한다."]
+    ];
+
+    var topicNameMap = {
+      "Pub & Bar": "술집/바",
+      "Overseas Trip": "해외여행",
+      "Movie": "영화",
+      "Cafe": "카페",
+      "Shopping": "쇼핑",
+      "Domestic Trip": "국내여행",
+      "House": "집",
+      "Home Vacation": "집 휴가",
+      "Transportation": "교통",
+      "Geography": "지형",
+      "Industry": "산업",
+      "Universal Experience": "만능 경험",
+      "Buying a Device": "전자기기 구매",
+      "Concert / Movie Ticket": "공연/영화 티켓",
+      "House Sitting Problem": "집 봐주기 문제",
+      "Shopping Problem": "쇼핑 문제",
+      "Hotel Reservation": "호텔 예약",
+      "Gathering / Party": "모임/파티",
+      "Real Estate": "부동산",
+      "Travel Agency": "여행사",
+      "Friend Visit": "친구 방문",
+      "Rental Car": "렌터카",
+      "Bank / Card": "은행/카드 문제",
+      "Housing Problem": "주거 문제",
+      "Technology Change": "기술 변화",
+      "Health": "건강",
+      "Shopping Change": "쇼핑 변화",
+      "Travel Change": "여행 변화",
+      "Coffee Shop Change": "카페 변화"
+    };
+
     function lowerText(value) {
       return String(value || "").toLowerCase();
     }
 
     function lessonTypeInfo(lesson) {
-      var topic = lowerText(lesson.topic);
+      var topic = lowerText(lesson.originalTopic || lesson.topic);
       var question = lowerText(lesson.question);
 
       if (lesson.category === "Role Play") {
@@ -992,11 +1054,11 @@
         return { badge: "15번 유형", type: "Advanced 이슈 / 변화 / 의견" };
       }
 
-      if (question.indexOf("first get interested") >= 0 || question.indexOf("changed over the years") >= 0 || topic.indexOf("q2") >= 0) {
+      if (question.indexOf("first get interested") >= 0 || question.indexOf("changed over the years") >= 0 || topic.indexOf("3/6/9") >= 0) {
         return { badge: "3/6/9번 유형", type: "루틴 + 과거/현재 비교" };
       }
 
-      if (question.indexOf("remember") >= 0 || question.indexOf("experience") >= 0 || question.indexOf("a time when") >= 0 || question.indexOf("trip you took") >= 0 || topic.indexOf("q4") >= 0) {
+      if (question.indexOf("remember") >= 0 || question.indexOf("experience") >= 0 || question.indexOf("a time when") >= 0 || question.indexOf("trip you took") >= 0 || topic.indexOf("4/7/10") >= 0) {
         return { badge: "4/7/10번 유형", type: "최근 경험 / 잊지 못할 경험" };
       }
 
@@ -1005,7 +1067,7 @@
 
     function buildTips(lesson) {
       var info = lessonTypeInfo(lesson);
-      var topicName = lesson.topic.split(" - ")[0];
+      var topicName = displayTopicName(lesson);
 
       if (info.badge === "11번 유형") {
         return [
@@ -1076,11 +1138,28 @@
       ];
     }
 
+    function displayTopicName(lesson) {
+      var original = lesson.originalTopic || lesson.topic;
+      var parts = original.split(" - ");
+      if (parts[0] === "음악") return "음악";
+      return topicNameMap[original] || original;
+    }
+
+    function displayLessonTopic(lesson) {
+      var info = lessonTypeInfo(lesson);
+      var name = displayTopicName(lesson);
+      return name + " - " + info.badge + " - " + info.type;
+    }
+
     function normalizeLessons() {
       for (var i = 0; i < lessons.length; i += 1) {
         if (lessons[i].category === "Survey Guide") continue;
+        if (!lessons[i].originalTopic) {
+          lessons[i].originalTopic = lessons[i].topic;
+        }
         var info = lessonTypeInfo(lessons[i]);
         lessons[i].badge = info.badge;
+        lessons[i].topic = displayLessonTopic(lessons[i]);
         if (!lessons[i].tips) {
           lessons[i].tips = buildTips(lessons[i]);
         }
@@ -1119,6 +1198,7 @@
       for (var j = 0; j < categories.length; j += 1) {
         if (categories[j] !== "Survey Guide") ordered.push(categories[j]);
       }
+      ordered.push("시험 구성표");
       ordered.push("Survey Guide");
       return ordered;
     }
@@ -1136,10 +1216,10 @@
     function fillTopics() {
       var category = categorySelect.value;
       topicSelect.innerHTML = "";
-      if (category === "Survey Guide") {
+      if (category === "Survey Guide" || category === "시험 구성표") {
         var option = document.createElement("option");
-        option.value = "survey";
-        option.textContent = "Recommended Survey Choices";
+        option.value = category === "Survey Guide" ? "survey" : "type-guide";
+        option.textContent = category === "Survey Guide" ? "Recommended Survey Choices" : "시험 번호별 문제 유형";
         topicSelect.appendChild(option);
         renderLesson();
         return;
@@ -1157,7 +1237,7 @@
 
     function currentLesson() {
       var category = categorySelect.value;
-      if (category === "Survey Guide") return null;
+      if (category === "Survey Guide" || category === "시험 구성표") return null;
       var index = Number(topicSelect.value || 0);
       return lessons.filter(function (lesson) { return lesson.category === category; })[index];
     }
@@ -1192,6 +1272,33 @@
 
     function renderLesson() {
       stopSpeech();
+      if (categorySelect.value === "시험 구성표") {
+        topicTitle.textContent = "시험 번호별 문제 유형";
+        topicNote.textContent = "";
+        topicBadge.textContent = "구성표";
+        questionArea.classList.add("hidden");
+        surveyCard.classList.remove("hidden");
+        storyCard.classList.add("hidden");
+        structureCard.classList.add("hidden");
+        tipCard.classList.add("hidden");
+        scriptCard.classList.add("hidden");
+        memoryCard.classList.add("hidden");
+        surveyCard.querySelector("h3").textContent = "시험 구성표";
+        surveyList.className = "type-guide";
+        surveyList.innerHTML = "";
+        typeGuideRows.forEach(function (row) {
+          var li = document.createElement("li");
+          var strong = document.createElement("strong");
+          var span = document.createElement("span");
+          strong.textContent = row[0] + " - " + row[1];
+          span.textContent = row[2];
+          li.appendChild(strong);
+          li.appendChild(span);
+          surveyList.appendChild(li);
+        });
+        return;
+      }
+
       if (categorySelect.value === "Survey Guide") {
         topicTitle.textContent = "Recommended Survey Choices";
         topicNote.textContent = "필요할 때만 확인하는 서베이 선택 목록";
@@ -1203,6 +1310,8 @@
         tipCard.classList.add("hidden");
         scriptCard.classList.add("hidden");
         memoryCard.classList.add("hidden");
+        surveyCard.querySelector("h3").textContent = "선택할 서베이 항목";
+        surveyList.className = "survey-list";
         surveyList.innerHTML = "";
         surveyChoices.forEach(function (choice) {
           var li = document.createElement("li");
