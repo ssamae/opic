@@ -1235,7 +1235,13 @@
     function displayLessonTopic(lesson) {
       var info = lessonTypeInfo(lesson);
       var name = displayTopicName(lesson);
-      return name + " - " + info.badge + " - " + info.type;
+      var original = lesson.originalTopic || lesson.topic;
+      var parts = original.split(" - ");
+      var detail = info.type;
+      if (parts.length >= 3 && parts[1].indexOf("유형") >= 0) {
+        detail = parts.slice(2).join(" - ");
+      }
+      return name + " - " + info.badge + " - " + detail;
     }
 
     function normalizeLessons() {
