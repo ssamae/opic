@@ -3020,6 +3020,33 @@
       return info.badge + " - " + detail;
     }
 
+    function questionSortOrder(lesson) {
+      var badge = lessonTypeInfo(lesson).badge;
+      if (badge.indexOf("2/5/8") >= 0) return 20;
+      if (badge.indexOf("3/6/9") >= 0) return 30;
+      if (badge.indexOf("4/7/10") >= 0) return 40;
+      if (badge.indexOf("11") >= 0) return 110;
+      if (badge.indexOf("12") >= 0) return 120;
+      if (badge.indexOf("13") >= 0) return 130;
+      if (badge.indexOf("14") >= 0) return 140;
+      if (badge.indexOf("15") >= 0) return 150;
+      return 999;
+    }
+
+    function selectedLessonsFor(category, selectedTopic) {
+      return lessons
+        .map(function (lesson, index) { return { lesson: lesson, index: index }; })
+        .filter(function (entry) {
+          return entry.lesson.category === category && displayTopicName(entry.lesson) === selectedTopic;
+        })
+        .sort(function (a, b) {
+          var orderDiff = questionSortOrder(a.lesson) - questionSortOrder(b.lesson);
+          if (orderDiff !== 0) return orderDiff;
+          return a.index - b.index;
+        })
+        .map(function (entry) { return entry.lesson; });
+    }
+
     function fillQuestions() {
       var category = categorySelect.value;
       questionSelect.innerHTML = "";
@@ -3032,8 +3059,7 @@
         return;
       }
       var selectedTopic = topicSelect.value;
-      lessons
-        .filter(function (lesson) { return lesson.category === category && displayTopicName(lesson) === selectedTopic; })
+      selectedLessonsFor(category, selectedTopic)
         .forEach(function (lesson, index) {
           var option = document.createElement("option");
           option.value = String(index);
@@ -3048,7 +3074,7 @@
       if (category === "가이드") return null;
       var selectedTopic = topicSelect.value;
       var index = Number(questionSelect.value || 0);
-      return lessons.filter(function (lesson) { return lesson.category === category && displayTopicName(lesson) === selectedTopic; })[index];
+      return selectedLessonsFor(category, selectedTopic)[index];
     }
 
     function currentGuideSection() {
@@ -3252,9 +3278,26 @@
       setPlaybackMode(null);
     }
 
-    categorySelect.addEventListener("change", fillTopics);
-    topicSelect.addEventListener("change", fillQuestions);
-    questionSelect.addEventListener("change", renderLesson);
+    function scrollToTop() {
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      } catch (error) {
+        window.scrollTo(0, 0);
+      }
+    }
+
+    categorySelect.addEventListener("change", function () {
+      fillTopics();
+      scrollToTop();
+    });
+    topicSelect.addEventListener("change", function () {
+      fillQuestions();
+      scrollToTop();
+    });
+    questionSelect.addEventListener("change", function () {
+      renderLesson();
+      scrollToTop();
+    });
     if (window.speechSynthesis && window.speechSynthesis.getVoices) {
       window.speechSynthesis.onvoiceschanged = function () {
         window.speechSynthesis.getVoices();
