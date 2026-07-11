@@ -171,19 +171,19 @@
     }
 
     .question p {
-      margin: 12px 0 0;
+      margin: 0;
       font-size: 17px;
       font-weight: 700;
       line-height: 1.55;
     }
 
     button {
-      min-width: 150px;
-      min-height: 48px;
+      min-width: 0;
+      min-height: 40px;
       border: 0;
       background: var(--accent);
       color: #fff;
-      padding: 12px 14px;
+      padding: 8px 12px;
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
@@ -251,6 +251,24 @@
       gap: 8px;
     }
 
+    .section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-title-row h3 {
+      margin: 0;
+    }
+
+    .title-play-button {
+      width: auto;
+      min-width: 118px;
+      white-space: nowrap;
+    }
+
     .set-player {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -263,6 +281,10 @@
       flex-direction: row;
       align-items: end;
       gap: 6px;
+    }
+
+    .set-actions button {
+      width: 100%;
     }
 
     .set-status {
@@ -490,6 +512,16 @@
         min-width: 0;
       }
 
+      .section-title-row {
+        gap: 8px;
+      }
+
+      .section-title-row .title-play-button {
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 112px;
+      }
+
       .card {
         padding: 14px;
         margin-bottom: 10px;
@@ -587,11 +619,11 @@
       </div>
 
       <div id="questionArea">
-        <h3>Question</h3>
+        <div class="section-title-row">
+          <h3>Question</h3>
+          <button class="title-play-button" id="questionPlayButton" type="button" onclick="toggleQuestion()">Play Question</button>
+        </div>
         <div class="question">
-          <div class="question-tools">
-            <button id="questionPlayButton" type="button" onclick="toggleQuestion()">Play Question</button>
-          </div>
           <p id="questionText">You indicated that you like listening to music. What kind of music do you like? Who is your favorite singer?</p>
         </div>
       </div>
@@ -639,9 +671,9 @@
     </section>
 
     <section class="card" id="scriptCard">
-      <h3>영어 연습용</h3>
-      <div class="script-tools">
-        <button id="answerPlayButton" type="button" onclick="toggleAnswer()">Play Answer</button>
+      <div class="section-title-row">
+        <h3>영어 연습용</h3>
+        <button class="title-play-button" id="answerPlayButton" type="button" onclick="toggleAnswer()">Play Answer</button>
       </div>
       <div class="script" id="scriptBox">
         <p>I like pop music the most.</p>
