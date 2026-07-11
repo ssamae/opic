@@ -1134,6 +1134,8 @@
     var setQueueIndex = 0;
     var setRepeatIndex = 0;
     var setPhaseIndex = 0;
+    var setSyncedLesson = null;
+    var syncingSetScreen = false;
     var surveyChoices = [
       "일 경험 없음",
       "학생 아님",
@@ -3194,7 +3196,7 @@
     }
 
     function renderLesson() {
-      stopSpeech();
+      if (!syncingSetScreen) stopSpeech();
       if (categorySelect.value === "가이드") {
         var section = currentGuideSection();
         topicTitle.textContent = section.title;
@@ -3404,6 +3406,51 @@
       return current + "/" + total + " - " + repeat + "/" + repeatTotal + "회 - " + phaseText + " 재생 중";
     }
 
+    function fillTopicOptionsOnly(category, topicName) {
+      topicSelect.innerHTML = "";
+      var seen = {};
+      lessons.filter(function (lesson) { return lesson.category === category; }).forEach(function (lesson) {
+        var currentTopic = displayTopicName(lesson);
+        if (seen[currentTopic]) return;
+        seen[currentTopic] = true;
+        var option = document.createElement("option");
+        option.value = currentTopic;
+        option.textContent = currentTopic;
+        topicSelect.appendChild(option);
+      });
+      topicSelect.value = topicName;
+    }
+
+    function fillQuestionOptionsOnly(category, topicName, targetLesson) {
+      questionSelect.innerHTML = "";
+      var selected = 0;
+      selectedLessonsFor(category, topicName).forEach(function (lesson, index) {
+        var option = document.createElement("option");
+        option.value = String(index);
+        option.textContent = questionLabel(lesson);
+        questionSelect.appendChild(option);
+        if (lesson === targetLesson) selected = index;
+      });
+      questionSelect.value = String(selected);
+    }
+
+    function syncScreenToSetLesson(lesson) {
+      if (!lesson || setSyncedLesson === lesson) return;
+      var category = lesson.category;
+      var topicName = displayTopicName(lesson);
+      categorySelect.value = category;
+      fillTopicOptionsOnly(category, topicName);
+      fillQuestionOptionsOnly(category, topicName, lesson);
+      setSyncedLesson = lesson;
+      syncingSetScreen = true;
+      try {
+        renderLesson();
+      } finally {
+        syncingSetScreen = false;
+      }
+      scrollToTop();
+    }
+
     function toggleSetPlayback() {
       if (setPlayback) {
         stopSpeech();
@@ -3424,6 +3471,7 @@
       setQueueIndex = 0;
       setRepeatIndex = 0;
       setPhaseIndex = 0;
+      setSyncedLesson = null;
       setPlaybackMode("set");
       runSetStep();
     }
@@ -3436,6 +3484,7 @@
         return;
       }
       var lesson = setQueue[setQueueIndex];
+      syncScreenToSetLesson(lesson);
       var phases = setPhases();
       var phase = phases[setPhaseIndex];
       var text = phase === "question" ? lesson.question : lesson.script.join(" ");
