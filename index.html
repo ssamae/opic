@@ -277,7 +277,7 @@
 
     .set-player {
       display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px;
       align-items: end;
     }
@@ -593,9 +593,9 @@
           <label for="setRepeatSelect">항목당 반복</label>
           <select id="setRepeatSelect">
             <option value="1">1회</option>
-            <option value="2" selected>2회</option>
-            <option value="3">3회</option>
-            <option value="5">5회</option>
+            <option value="3" selected>3회</option>
+            <option value="4">4회</option>
+            <option value="infinite">무한</option>
           </select>
         </div>
         <div>
@@ -610,15 +610,6 @@
           <select id="setScopeSelect">
             <option value="topic">현재 Topic</option>
             <option value="part">현재 Part</option>
-          </select>
-        </div>
-        <div>
-          <label for="setLoopSelect">전체 반복</label>
-          <select id="setLoopSelect">
-            <option value="1">1회</option>
-            <option value="3">3회</option>
-            <option value="5">5회</option>
-            <option value="infinite">무한</option>
           </select>
         </div>
         <div class="set-actions">
@@ -1183,7 +1174,6 @@
     var setRepeatSelect = document.getElementById("setRepeatSelect");
     var setOrderSelect = document.getElementById("setOrderSelect");
     var setScopeSelect = document.getElementById("setScopeSelect");
-    var setLoopSelect = document.getElementById("setLoopSelect");
     var setPlayButton = document.getElementById("setPlayButton");
     var setNextButton = document.getElementById("setNextButton");
     var setStatus = document.getElementById("setStatus");
@@ -1197,7 +1187,6 @@
     var setQueueIndex = 0;
     var setRepeatIndex = 0;
     var setPhaseIndex = 0;
-    var setLoopIndex = 0;
     var setSyncedLesson = null;
     var syncingSetScreen = false;
     var setSpeechRunId = 0;
@@ -3502,13 +3491,10 @@
       var total = setQueue.length;
       var current = setQueueIndex + 1;
       var repeat = setRepeatIndex + 1;
-      var repeatTotal = Number(setRepeatSelect.value || 1);
+      var repeatTotal = setRepeatSelect.value === "infinite" ? "무한" : setRepeatSelect.value;
       var phaseText = phase === "question" ? "문제" : "답변";
       var orderText = setOrderSelect.value === "random" ? "전체 랜덤 - " : "";
-      var loopText = setLoopSelect.value === "infinite"
-        ? " - 전체 무한"
-        : " - 전체 " + (setLoopIndex + 1) + "/" + setLoopSelect.value + "회";
-      return orderText + current + "/" + total + " - " + repeat + "/" + repeatTotal + "회 - " + phaseText + " 재생 중" + loopText;
+      return orderText + current + "/" + total + " - " + repeat + "/" + repeatTotal + "회 - " + phaseText + " 재생 중";
     }
 
     function fillTopicOptionsOnly(category, topicName) {
@@ -3576,40 +3562,14 @@
       setQueueIndex = 0;
       setRepeatIndex = 0;
       setPhaseIndex = 0;
-      setLoopIndex = 0;
       setSyncedLesson = null;
       setPlaybackMode("set");
       runSetStep();
     }
 
-    function rebuildSetQueue() {
-      var items = setPlaybackLessons();
-      setQueue = setOrderSelect.value === "random" ? shuffleItems(items) : items.slice();
-      setQueueIndex = 0;
-      setRepeatIndex = 0;
-      setPhaseIndex = 0;
-      setSyncedLesson = null;
-    }
-
-    function shouldLoopAgain() {
-      if (setLoopSelect.value === "infinite") return true;
-      return setLoopIndex + 1 < Number(setLoopSelect.value || 1);
-    }
-
     function runSetStep() {
       if (!setPlayback) return;
       if (setQueueIndex >= setQueue.length) {
-        if (shouldLoopAgain()) {
-          setLoopIndex += 1;
-          rebuildSetQueue();
-          if (!setQueue.length) {
-            stopSpeech();
-            setStatus.textContent = "재생할 항목이 없습니다.";
-            return;
-          }
-          runSetStep();
-          return;
-        }
         stopSpeech();
         setStatus.textContent = "세트 재생 완료";
         return;
@@ -3641,6 +3601,10 @@
       if (setPhaseIndex >= phases.length) {
         setPhaseIndex = 0;
         setRepeatIndex += 1;
+      }
+      if (setRepeatSelect.value === "infinite") {
+        runSetStep();
+        return;
       }
       if (setRepeatIndex >= Number(setRepeatSelect.value || 1)) {
         setRepeatIndex = 0;
