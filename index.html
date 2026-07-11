@@ -527,6 +527,47 @@
       <button class="mode-button" id="modeButton" type="button" onclick="toggleDarkMode()">Dark</button>
     </section>
 
+    <section class="card" id="setPlayerCard">
+      <h3>연속 재생</h3>
+      <div class="set-player">
+        <div>
+          <label for="setTargetSelect">대상</label>
+          <select id="setTargetSelect">
+            <option value="both">문제+답변</option>
+            <option value="question">문제만</option>
+            <option value="answer">답변만</option>
+          </select>
+        </div>
+        <div>
+          <label for="setRepeatSelect">항목당 반복</label>
+          <select id="setRepeatSelect">
+            <option value="1">1회</option>
+            <option value="2" selected>2회</option>
+            <option value="3">3회</option>
+            <option value="5">5회</option>
+          </select>
+        </div>
+        <div>
+          <label for="setOrderSelect">순서</label>
+          <select id="setOrderSelect">
+            <option value="sequential">순차</option>
+            <option value="random">랜덤</option>
+          </select>
+        </div>
+        <div>
+          <label for="setScopeSelect">범위</label>
+          <select id="setScopeSelect">
+            <option value="topic">현재 Topic</option>
+            <option value="part">현재 Part</option>
+          </select>
+        </div>
+        <div class="set-actions">
+          <button id="setPlayButton" type="button" onclick="toggleSetPlayback()">세트 재생</button>
+          <p class="set-status" id="setStatus">현재 Topic 기준으로 재생합니다.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="card">
       <div class="topic-line">
         <div>
@@ -586,47 +627,6 @@
         <li>좋아하는 장르와 가수를 먼저 말한다.</li>
         <li>이유와 감정을 짧은 문장으로 연결한다.</li>
       </ul>
-    </section>
-
-    <section class="card" id="setPlayerCard">
-      <h3>연속 재생</h3>
-      <div class="set-player">
-        <div>
-          <label for="setTargetSelect">대상</label>
-          <select id="setTargetSelect">
-            <option value="both">문제+답변</option>
-            <option value="question">문제만</option>
-            <option value="answer">답변만</option>
-          </select>
-        </div>
-        <div>
-          <label for="setRepeatSelect">항목당 반복</label>
-          <select id="setRepeatSelect">
-            <option value="1">1회</option>
-            <option value="2" selected>2회</option>
-            <option value="3">3회</option>
-            <option value="5">5회</option>
-          </select>
-        </div>
-        <div>
-          <label for="setOrderSelect">순서</label>
-          <select id="setOrderSelect">
-            <option value="sequential">순차</option>
-            <option value="random">랜덤</option>
-          </select>
-        </div>
-        <div>
-          <label for="setScopeSelect">범위</label>
-          <select id="setScopeSelect">
-            <option value="topic">현재 Topic</option>
-            <option value="part">현재 Part</option>
-          </select>
-        </div>
-        <div class="set-actions">
-          <button id="setPlayButton" type="button" onclick="toggleSetPlayback()">세트 재생</button>
-          <p class="set-status" id="setStatus">현재 Topic 기준으로 재생합니다.</p>
-        </div>
-      </div>
     </section>
 
     <section class="card" id="scriptCard">
