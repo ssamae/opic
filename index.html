@@ -253,23 +253,28 @@
 
     .set-player {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px;
       align-items: end;
     }
 
     .set-actions {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      align-items: end;
       gap: 6px;
     }
 
     .set-status {
-      min-height: 18px;
+      display: none;
       margin: 0;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.35;
+    }
+
+    .set-status.active {
+      display: block;
     }
 
     .story p,
@@ -476,6 +481,10 @@
         grid-template-columns: 1fr 1fr;
       }
 
+      .set-actions {
+        grid-column: 1 / -1;
+      }
+
       button {
         width: 100%;
         min-width: 0;
@@ -609,7 +618,7 @@
       </div>
     </section>
 
-    <section class="card" id="structureCard">
+    <section class="card hidden" id="structureCard">
       <h3>답변 구조</h3>
       <div class="structure" id="structureBox">
         <div class="step"><strong>Main Point</strong><span>I like pop music the most.</span></div>
@@ -620,7 +629,7 @@
       </div>
     </section>
 
-    <section class="card" id="tipCard">
+    <section class="card hidden" id="tipCard">
       <h3>문제 유형 & 팁</h3>
       <ul class="tips" id="tipBox">
         <li>유형: 묘사 / 루틴</li>
@@ -648,7 +657,7 @@
       </div>
     </section>
 
-    <section class="card" id="memoryCard">
+    <section class="card hidden" id="memoryCard">
       <h3>핵심 문장</h3>
       <ul class="memory" id="memoryBox">
         <li>I like pop music the most.</li>
@@ -3229,11 +3238,11 @@
       questionArea.classList.remove("hidden");
       surveyCard.classList.add("hidden");
       storyCard.classList.remove("hidden");
-      structureCard.classList.remove("hidden");
-      tipCard.classList.remove("hidden");
+      structureCard.classList.add("hidden");
+      tipCard.classList.add("hidden");
       setPlayerCard.classList.remove("hidden");
       scriptCard.classList.remove("hidden");
-      memoryCard.classList.remove("hidden");
+      memoryCard.classList.add("hidden");
       topicTitle.textContent = lesson.topic;
       topicNote.textContent = lesson.tips ? lesson.tips[0] : "유형: 기본 답변";
       topicBadge.textContent = lesson.badge;
@@ -3489,6 +3498,7 @@
       var phase = phases[setPhaseIndex];
       var text = phase === "question" ? lesson.question : lesson.script.join(" ");
       setStatus.textContent = setStatusText(lesson, phase);
+      setStatus.classList.add("active");
       speak(text, {
         voice: phase === "question" ? "female" : "male",
         rate: phase === "question" ? 0.88 : 0.82,
@@ -3529,6 +3539,7 @@
       setPlaybackMode(null);
       if (setStatus && setStatus.textContent !== "세트 재생 완료") {
         setStatus.textContent = "현재 Topic 기준으로 재생합니다.";
+        setStatus.classList.remove("active");
       }
     }
 
