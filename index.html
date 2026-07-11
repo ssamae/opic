@@ -277,14 +277,14 @@
 
     .set-player {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 8px;
       align-items: end;
     }
 
     .set-actions {
-      display: flex;
-      flex-direction: row;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: end;
       gap: 6px;
     }
@@ -294,6 +294,7 @@
     }
 
     .set-status {
+      grid-column: 1 / -1;
       display: none;
       margin: 0;
       color: var(--muted);
@@ -499,8 +500,7 @@
       }
 
       .question-tools,
-      .script-tools,
-      .set-actions {
+      .script-tools {
         display: grid;
         grid-template-columns: 1fr;
       }
@@ -511,6 +511,8 @@
 
       .set-actions {
         grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       button {
@@ -610,8 +612,16 @@
             <option value="part">현재 Part</option>
           </select>
         </div>
+        <div>
+          <label for="setLoopSelect">전체 반복</label>
+          <select id="setLoopSelect">
+            <option value="once">1회</option>
+            <option value="infinite">무한</option>
+          </select>
+        </div>
         <div class="set-actions">
           <button id="setPlayButton" type="button" onclick="toggleSetPlayback()">세트 재생</button>
+          <button id="setNextButton" type="button" onclick="skipSetPlayback()">다음</button>
           <p class="set-status" id="setStatus">현재 Topic 기준으로 재생합니다.</p>
         </div>
       </div>
@@ -1171,7 +1181,9 @@
     var setRepeatSelect = document.getElementById("setRepeatSelect");
     var setOrderSelect = document.getElementById("setOrderSelect");
     var setScopeSelect = document.getElementById("setScopeSelect");
+    var setLoopSelect = document.getElementById("setLoopSelect");
     var setPlayButton = document.getElementById("setPlayButton");
+    var setNextButton = document.getElementById("setNextButton");
     var setStatus = document.getElementById("setStatus");
     var questionLoop = false;
     var questionLoopTimer = null;
@@ -1185,6 +1197,7 @@
     var setPhaseIndex = 0;
     var setSyncedLesson = null;
     var syncingSetScreen = false;
+    var setSpeechRunId = 0;
     var surveyChoices = [
       "일 경험 없음",
       "학생 아님",
@@ -3378,9 +3391,11 @@
         if (mode === "set") {
           setPlayButton.classList.add("is-playing");
           setPlayButton.textContent = "세트 정지";
+          if (setNextButton) setNextButton.classList.add("is-playing");
         } else {
           setPlayButton.classList.remove("is-playing");
           setPlayButton.textContent = "세트 재생";
+          if (setNextButton) setNextButton.classList.remove("is-playing");
         }
       }
     }
@@ -3477,7 +3492,8 @@
       var repeat = setRepeatIndex + 1;
       var repeatTotal = Number(setRepeatSelect.value || 1);
       var phaseText = phase === "question" ? "문제" : "답변";
-      return current + "/" + total + " - " + repeat + "/" + repeatTotal + "회 - " + phaseText + " 재생 중";
+      var loopText = setLoopSelect.value === "infinite" ? " - 무한 반복" : "";
+      return current + "/" + total + " - " + repeat + "/" + repeatTotal + "회 - " + phaseText + " 재생 중" + loopText;
     }
 
     function fillTopicOptionsOnly(category, topicName) {
@@ -3550,9 +3566,28 @@
       runSetStep();
     }
 
+    function rebuildSetQueue() {
+      var items = setPlaybackLessons();
+      setQueue = setOrderSelect.value === "random" ? shuffleItems(items) : items.slice();
+      setQueueIndex = 0;
+      setRepeatIndex = 0;
+      setPhaseIndex = 0;
+      setSyncedLesson = null;
+    }
+
     function runSetStep() {
       if (!setPlayback) return;
       if (setQueueIndex >= setQueue.length) {
+        if (setLoopSelect.value === "infinite") {
+          rebuildSetQueue();
+          if (!setQueue.length) {
+            stopSpeech();
+            setStatus.textContent = "재생할 항목이 없습니다.";
+            return;
+          }
+          runSetStep();
+          return;
+        }
         stopSpeech();
         setStatus.textContent = "세트 재생 완료";
         return;
@@ -3562,13 +3597,14 @@
       var phases = setPhases();
       var phase = phases[setPhaseIndex];
       var text = phase === "question" ? lesson.question : lesson.script.join(" ");
+      var runId = setSpeechRunId += 1;
       setStatus.textContent = setStatusText(lesson, phase);
       setStatus.classList.add("active");
       speak(text, {
         voice: phase === "question" ? "female" : "male",
         rate: phase === "question" ? 0.88 : 0.82,
         onend: function () {
-          if (!setPlayback) return;
+          if (!setPlayback || runId !== setSpeechRunId) return;
           var delay = phase === "question" ? 2000 : 3000;
           clearTimeout(setPlaybackTimer);
           setPlaybackTimer = setTimeout(nextSetStep, delay);
@@ -3591,10 +3627,24 @@
       runSetStep();
     }
 
+    function skipSetPlayback() {
+      if (!setPlayback) {
+        startSetPlayback();
+        return;
+      }
+      clearTimeout(setPlaybackTimer);
+      setSpeechRunId += 1;
+      if (window.speechSynthesis && window.speechSynthesis.cancel) {
+        window.speechSynthesis.cancel();
+      }
+      nextSetStep();
+    }
+
     function stopSpeech() {
       questionLoop = false;
       answerLoop = false;
       setPlayback = false;
+      setSpeechRunId += 1;
       clearTimeout(questionLoopTimer);
       clearTimeout(answerLoopTimer);
       clearTimeout(setPlaybackTimer);
