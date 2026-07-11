@@ -602,7 +602,7 @@
           <label for="setOrderSelect">순서</label>
           <select id="setOrderSelect">
             <option value="sequential">순차</option>
-            <option value="random">랜덤</option>
+            <option value="random">전체 랜덤</option>
           </select>
         </div>
         <div>
@@ -3470,6 +3470,15 @@
     function setPlaybackLessons() {
       var category = categorySelect.value;
       if (category === "가이드") return [];
+      if (setOrderSelect.value === "random") {
+        return lessons.slice().sort(function (a, b) {
+          var categoryDiff = a.category.localeCompare(b.category, "ko");
+          if (categoryDiff !== 0) return categoryDiff;
+          var topicDiff = displayTopicName(a).localeCompare(displayTopicName(b), "ko");
+          if (topicDiff !== 0) return topicDiff;
+          return questionSortOrder(a) - questionSortOrder(b);
+        });
+      }
       if (setScopeSelect.value === "part") {
         return lessons
           .filter(function (lesson) { return lesson.category === category; })
@@ -3495,10 +3504,11 @@
       var repeat = setRepeatIndex + 1;
       var repeatTotal = Number(setRepeatSelect.value || 1);
       var phaseText = phase === "question" ? "문제" : "답변";
+      var orderText = setOrderSelect.value === "random" ? "전체 랜덤 - " : "";
       var loopText = setLoopSelect.value === "infinite"
         ? " - 전체 무한"
         : " - 전체 " + (setLoopIndex + 1) + "/" + setLoopSelect.value + "회";
-      return current + "/" + total + " - " + repeat + "/" + repeatTotal + "회 - " + phaseText + " 재생 중" + loopText;
+      return orderText + current + "/" + total + " - " + repeat + "/" + repeatTotal + "회 - " + phaseText + " 재생 중" + loopText;
     }
 
     function fillTopicOptionsOnly(category, topicName) {
