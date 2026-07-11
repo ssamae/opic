@@ -615,7 +615,9 @@
         <div>
           <label for="setLoopSelect">전체 반복</label>
           <select id="setLoopSelect">
-            <option value="once">1회</option>
+            <option value="1">1회</option>
+            <option value="3">3회</option>
+            <option value="5">5회</option>
             <option value="infinite">무한</option>
           </select>
         </div>
@@ -1195,6 +1197,7 @@
     var setQueueIndex = 0;
     var setRepeatIndex = 0;
     var setPhaseIndex = 0;
+    var setLoopIndex = 0;
     var setSyncedLesson = null;
     var syncingSetScreen = false;
     var setSpeechRunId = 0;
@@ -3492,7 +3495,9 @@
       var repeat = setRepeatIndex + 1;
       var repeatTotal = Number(setRepeatSelect.value || 1);
       var phaseText = phase === "question" ? "문제" : "답변";
-      var loopText = setLoopSelect.value === "infinite" ? " - 무한 반복" : "";
+      var loopText = setLoopSelect.value === "infinite"
+        ? " - 전체 무한"
+        : " - 전체 " + (setLoopIndex + 1) + "/" + setLoopSelect.value + "회";
       return current + "/" + total + " - " + repeat + "/" + repeatTotal + "회 - " + phaseText + " 재생 중" + loopText;
     }
 
@@ -3561,6 +3566,7 @@
       setQueueIndex = 0;
       setRepeatIndex = 0;
       setPhaseIndex = 0;
+      setLoopIndex = 0;
       setSyncedLesson = null;
       setPlaybackMode("set");
       runSetStep();
@@ -3575,10 +3581,16 @@
       setSyncedLesson = null;
     }
 
+    function shouldLoopAgain() {
+      if (setLoopSelect.value === "infinite") return true;
+      return setLoopIndex + 1 < Number(setLoopSelect.value || 1);
+    }
+
     function runSetStep() {
       if (!setPlayback) return;
       if (setQueueIndex >= setQueue.length) {
-        if (setLoopSelect.value === "infinite") {
+        if (shouldLoopAgain()) {
+          setLoopIndex += 1;
           rebuildSetQueue();
           if (!setQueue.length) {
             stopSpeech();
@@ -3637,7 +3649,10 @@
       if (window.speechSynthesis && window.speechSynthesis.cancel) {
         window.speechSynthesis.cancel();
       }
-      nextSetStep();
+      setPhaseIndex = 0;
+      setRepeatIndex = 0;
+      setQueueIndex += 1;
+      runSetStep();
     }
 
     function stopSpeech() {
