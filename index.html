@@ -3116,6 +3116,101 @@
       });
     }
 
+    function simplifyAllScriptsForIM3() {
+      function wordCount(items) {
+        return (items || []).join(" ").split(/\s+/).filter(Boolean).length;
+      }
+
+      function uniqueValid(indexes, length) {
+        var seen = {};
+        var result = [];
+        indexes.forEach(function (index) {
+          if (index < 0) index = length + index;
+          if (index < 0 || index >= length || seen[index]) return;
+          seen[index] = true;
+          result.push(index);
+        });
+        return result.sort(function (a, b) { return a - b; });
+      }
+
+      function applyIndexes(lesson, indexes) {
+        var oldScript = lesson.script || [];
+        var oldStory = lesson.story || [];
+        var valid = uniqueValid(indexes, oldScript.length);
+        lesson.script = valid.map(function (index) { return oldScript[index]; });
+        if (oldStory.length === oldScript.length) {
+          lesson.story = valid.map(function (index) { return oldStory[index]; });
+        } else {
+          lesson.story = oldStory.slice(0, lesson.script.length);
+        }
+        lesson.memory = lesson.script.slice(0, 4);
+      }
+
+      function trimToTarget(lesson, targetWords, minSentences) {
+        minSentences = minSentences || 5;
+        while (wordCount(lesson.script) > targetWords && lesson.script.length > minSentences) {
+          var removeIndex = lesson.script.length - 2;
+          lesson.script.splice(removeIndex, 1);
+          if (lesson.story && lesson.story.length > removeIndex) lesson.story.splice(removeIndex, 1);
+        }
+        lesson.memory = lesson.script.slice(0, 4);
+      }
+
+      function simplifyRolePlay(lesson) {
+        var info = lessonTypeInfo(lesson);
+        var script = lesson.script || [];
+        if (script.length <= 6 && wordCount(script) <= 60) return;
+
+        if (info.badge === "11번 유형") {
+          var questionIndexes = [];
+          for (var i = 0; i < script.length; i += 1) {
+            if (/\?$/.test(String(script[i]).trim())) questionIndexes.push(i);
+          }
+          var indexes = [0, 1].concat(questionIndexes.slice(0, 4));
+          if (!/\?$/.test(String(script[script.length - 1]).trim())) indexes.push(script.length - 1);
+          applyIndexes(lesson, indexes);
+          trimToTarget(lesson, 58, 5);
+          return;
+        }
+
+        if (info.badge === "12번 유형") {
+          var questionOrRequest = [];
+          for (var j = 0; j < script.length; j += 1) {
+            if (/\?$/.test(String(script[j]).trim()) || /please|let me know|could|can you|would like|will/i.test(script[j])) {
+              questionOrRequest.push(j);
+            }
+          }
+          applyIndexes(lesson, [0, 1, 2, 3].concat(questionOrRequest.slice(-3)));
+          trimToTarget(lesson, 58, 5);
+          return;
+        }
+
+        applyIndexes(lesson, [0, 1, 2, 3, -1]);
+        trimToTarget(lesson, 55, 5);
+      }
+
+      function simplifyStandard(lesson) {
+        if (!lesson.script || lesson.script.length <= 5) return;
+        var target = lesson.category === "Advanced" ? 55 : 52;
+        if (wordCount(lesson.script) <= target) return;
+        applyIndexes(lesson, [0, 1, 2, 3, -1]);
+        trimToTarget(lesson, target, 5);
+      }
+
+      lessons.forEach(function (lesson) {
+        if (lesson.category === "Survey Guide") return;
+        if (lesson.category === "Role Play") simplifyRolePlay(lesson);
+        else simplifyStandard(lesson);
+
+        lesson.script = (lesson.script || []).map(function (sentence) {
+          sentence = String(sentence || "").trim();
+          if (!sentence) return sentence;
+          return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+        });
+        lesson.memory = lesson.script.slice(0, 4);
+      });
+    }
+
     function lessonTypeInfo(lesson) {
       var topic = lowerText(lesson.originalTopic || lesson.topic);
       var question = lowerText(lesson.question);
@@ -3880,6 +3975,7 @@
     nojamRewriteAll();
     restoreRolePlayBookContent();
     restoreStandardQuestionContent();
+    simplifyAllScriptsForIM3();
     normalizeLessons();
     placePlaybackButtons();
     fillCategories();
