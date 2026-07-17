@@ -3041,6 +3041,81 @@
       });
     }
 
+    function restoreStandardQuestionContent() {
+      function updateLesson(match, data) {
+        for (var i = 0; i < lessons.length; i += 1) {
+          var lesson = lessons[i];
+          if (lesson.category === "Role Play" || lesson.category === "Survey Guide") continue;
+          var original = lesson.originalTopic || lesson.topic;
+          if (!match(original, lesson.question || "")) continue;
+          if (data.topic) {
+            lesson.originalTopic = data.topic;
+            lesson.topic = data.topic;
+          }
+          if (data.question) lesson.question = data.question;
+          lesson.story = data.story;
+          lesson.script = data.script;
+          lesson.memory = data.script.slice(0, 4);
+          lesson.tips = data.tips;
+        }
+      }
+
+      function topicHas(text) {
+        return function (topic) {
+          return String(topic).indexOf(text) >= 0;
+        };
+      }
+
+      updateLesson(function (topic, question) {
+        return String(topic).indexOf("기술 변화") >= 0 || String(topic).indexOf("Technology Change") >= 0 || String(question).toLowerCase().indexOf("technology changed") >= 0;
+      }, {
+        topic: "기술 변화 - 14번 유형 - 과거/현재 비교",
+        story: ["기술은 과거와 비교해서 많이 달라졌다.", "예전에는 정보를 찾으려면 주로 컴퓨터가 필요했다.", "하지만 지금은 스마트폰으로 거의 모든 것을 할 수 있다.", "길 찾기, 쇼핑, 결제, 공부도 휴대폰으로 가능하다.", "그래서 사람들의 생활은 훨씬 편리해졌다.", "나는 이런 기술 변화가 긍정적이라고 생각한다."],
+        script: ["Technology has changed a lot compared to the past.", "In the past, people usually needed computers to find information.", "But now, people can do almost everything with smartphones.", "They can find directions, shop, pay, and study on their phones.", "Because of this, daily life has become much more convenient.", "So, I think this change is positive."],
+        tips: ["유형: 과거/현재 비교", "질문 요구사항: 과거 기술 사용과 현재 스마트폰 중심 생활을 비교한다.", "컴퓨터에서 스마트폰으로 바뀐 점을 말한다.", "마무리는 생활이 편리해졌다는 의견으로 닫는다."]
+      });
+
+      updateLesson(topicHas("영화 - 15번 유형"), {
+        story: ["최근에 해외 작품에 출연한 한국 배우에 대한 뉴스를 봤다.", "그 배우는 좋은 연기로 많은 관심을 받았다.", "사람들은 한국 배우가 해외에서 활동하는 것을 긍정적으로 봤다.", "나도 그 뉴스를 보고 자랑스럽다고 느꼈다.", "이런 소식은 한국 영화와 배우의 인기를 보여 준다.", "그래서 그 배우 관련 뉴스가 기억에 남는다."],
+        script: ["Recently, I saw news about a Korean actor.", "The actor got attention because he appeared in an overseas movie.", "Many people reacted positively to the news.", "I also felt proud because a Korean actor was working internationally.", "I think this shows that Korean movies and actors are becoming more popular.", "So, I remember that news about the actor."],
+        tips: ["유형: 이슈 / 뉴스", "질문 요구사항: 뉴스에 나온 배우 이슈를 답한다.", "배우, 뉴스 내용, 사람들 반응, 내 감정을 말한다."]
+      });
+
+      updateLesson(topicHas("카페 - 15번 유형"), {
+        story: ["한국에서 카페는 매우 인기가 많다.", "사람들은 카페에서 커피를 마시고 쉬기도 한다.", "많은 카페에는 와이파이와 콘센트가 있다.", "그래서 공부하거나 일하기에도 좋다.", "분위기도 조용하고 편해서 오래 머물기 좋다.", "그래서 카페는 일상에서 중요한 공간이 되었다."],
+        script: ["Cafes are very popular in Korea.", "People drink coffee and relax at cafes.", "Many cafes have Wi-Fi and outlets.", "So, they are good places to study or work.", "The mood is usually quiet and comfortable, so people can stay there for a long time.", "That is why cafes have become important places in daily life."],
+        tips: ["유형: 인기 이유", "질문 요구사항: 카페가 인기가 많아진 이유를 답한다.", "커피, 휴식, 와이파이, 콘센트, 공부/일을 연결한다."]
+      });
+
+      updateLesson(topicHas("집 휴가 - 4/7/10번 유형 - 지난 휴가"), {
+        story: ["지난 휴가 때 나는 집에서 쉬었다.", "늦게 일어나서 편하게 하루를 시작했다.", "영화를 보고 음악도 들었다.", "점심에는 좋아하는 음식을 배달시켰다.", "밖에 나가지 않았지만 조용하고 편안했다.", "그래서 그 휴가는 나에게 좋은 휴식이었다."],
+        script: ["Last vacation, I stayed home and rested.", "I woke up late and started the day slowly.", "I watched movies and listened to music.", "For lunch, I ordered my favorite food.", "I did not go outside, but it was quiet and comfortable.", "So, that vacation was a good break for me."],
+        tips: ["유형: 최근 경험", "질문 요구사항: 지난 집 휴가 때 실제로 한 일을 말한다.", "일반 루틴이 아니라 Last vacation으로 시작한다."]
+      });
+
+      updateLesson(topicHas("해외여행 - 2/5/8번 유형 - 여행 중 하는 일"), {
+        story: ["해외여행을 가면 나는 먼저 유명한 장소를 방문한다.", "사진을 많이 찍고 거리를 걸어 다닌다.", "현지 음식도 꼭 먹어 본다.", "시장이나 쇼핑몰에서 기념품을 사기도 한다.", "새로운 문화를 볼 수 있어서 항상 신난다.", "그래서 해외여행은 나에게 특별한 경험이다."],
+        script: ["When I travel overseas, I first visit famous places.", "I take many pictures and walk around the streets.", "I also try local food.", "Sometimes, I buy souvenirs at markets or shopping malls.", "I feel excited because I can experience a new culture.", "So, traveling overseas is a special experience for me."],
+        tips: ["유형: 묘사 / 루틴", "질문 요구사항: 해외여행 중 하는 일을 답한다.", "장소 방문, 사진, 음식, 기념품, 감정을 말한다."]
+      });
+
+      updateLesson(topicHas("산업 - 3/6/9번 유형"), {
+        story: ["내가 관심 있는 산업은 기술 산업이다.", "예전에는 제조업이 더 중심이었다.", "하지만 지금은 IT와 반도체 산업이 매우 중요해졌다.", "스마트폰과 인공지능 같은 기술도 빠르게 발전하고 있다.", "이 변화는 한국 경제에도 큰 영향을 준다.", "그래서 나는 기술 산업의 변화가 매우 흥미롭다고 생각한다."],
+        script: ["One industry I am interested in is the technology industry.", "In the past, manufacturing was more important.", "But now, IT and semiconductor industries are very important.", "Technologies like smartphones and AI are developing quickly.", "This change also affects the Korean economy a lot.", "So, I think the change in the technology industry is very interesting."],
+        tips: ["유형: 과거/현재 비교", "질문 요구사항: 관심 산업의 과거와 현재 변화를 답한다.", "제조업에서 IT/반도체 중심으로 변화한 점을 말한다."]
+      });
+
+      lessons.forEach(function (lesson) {
+        if (!lesson.script) return;
+        lesson.script = lesson.script.map(function (sentence) {
+          sentence = String(sentence || "").trim();
+          if (!sentence) return sentence;
+          return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+        });
+        lesson.memory = lesson.script.slice(0, 4);
+      });
+    }
+
     function lessonTypeInfo(lesson) {
       var topic = lowerText(lesson.originalTopic || lesson.topic);
       var question = lowerText(lesson.question);
@@ -3804,6 +3879,7 @@
     polishLessonsForIM3();
     nojamRewriteAll();
     restoreRolePlayBookContent();
+    restoreStandardQuestionContent();
     normalizeLessons();
     placePlaybackButtons();
     fillCategories();
