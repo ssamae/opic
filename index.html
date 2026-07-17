@@ -1842,6 +1842,7 @@
           .replace(/^Could you can you/i, "Could you")
           .replace(/^If possible, can you/i, "Could you")
           .replace(/^For me, it is/i, "For me, it is")
+          .replace(/^For me, with my smartphone/i, "With my smartphone")
           .replace(/^people can/i, "People can")
           .replace(/^shopping is/i, "Shopping is")
           .replace(/^cafes are/i, "Cafes are")
@@ -3240,6 +3241,78 @@
       });
     }
 
+    function addLightFeelingWords() {
+      var starters = {
+        basic: ["Honestly, ", "For me, ", "Actually, ", "Personally, "],
+        compare: ["Actually, ", "In my experience, ", "To be honest, ", "Overall, "],
+        experience: ["Honestly, ", "I remember this clearly. ", "At that time, ", "To be honest, "],
+        issue: ["To be honest, ", "Actually, ", "In my opinion, ", "Honestly, "],
+        roleAsk: ["Actually, ", "First, ", "Also, ", "And one more thing, "],
+        roleSolve: ["To be honest, ", "Actually, ", "If possible, ", "I am sorry, but "],
+        rolePast: ["Honestly, ", "At that time, ", "I remember this clearly. ", "Actually, "]
+      };
+
+      function hasNaturalStart(sentence) {
+        return /^(honestly|actually|personally|for me|to be honest|in my experience|at that time|overall|also|first|and one more thing|i remember this clearly|in my opinion),?\s/i.test(String(sentence || ""));
+      }
+
+      function stripForPrefix(sentence) {
+        return String(sentence || "")
+          .replace(/^(honestly|actually|personally|for me|to be honest|in my experience|at that time|overall|also|first|and one more thing|i remember this clearly|in my opinion),?\s+/i, "")
+          .replace(/^I am sorry, but\s+/i, "");
+      }
+
+      function withPrefix(prefix, sentence) {
+        sentence = stripForPrefix(sentence).trim();
+        if (!prefix || !sentence) return sentence;
+        if (/\.\s$/.test(prefix)) return prefix + sentence.charAt(0).toUpperCase() + sentence.slice(1);
+        if (/^(I|IU|AI|Korea|Osaka|Busan|CGV|BTS)\b/.test(sentence)) return prefix + sentence;
+        return prefix + sentence.charAt(0).toLowerCase() + sentence.slice(1);
+      }
+
+      function softenFeeling(sentence) {
+        sentence = String(sentence || "");
+        return sentence
+          .replace(/^For me, with my smartphone/i, "With my smartphone")
+          .replace(/\bI felt comfortable\b/g, "I felt really comfortable")
+          .replace(/\bI felt happy\b/g, "I felt pretty happy")
+          .replace(/\bI felt excited\b/g, "I felt really excited")
+          .replace(/\bI feel relaxed\b/g, "I feel really relaxed")
+          .replace(/\bI feel comfortable\b/g, "I feel really comfortable")
+          .replace(/\bI was worried\b/g, "I was a little worried")
+          .replace(/\bI was tired\b/g, "I was pretty tired")
+          .replace(/\bIt was a good memory\b/g, "It was a really good memory")
+          .replace(/\bIt was okay\b/g, "It was okay, honestly")
+          .replace(/\bIt was great\b/g, "It was really great");
+      }
+
+      lessons.forEach(function (lesson) {
+        if (lesson.category === "Survey Guide" || !lesson.script || lesson.script.length < 4) return;
+        var info = lessonTypeInfo(lesson);
+        var groupName = "basic";
+        if (lesson.category === "Role Play") {
+          if (info.badge === "11번 유형") groupName = "roleAsk";
+          else if (info.badge === "12번 유형") groupName = "roleSolve";
+          else groupName = "rolePast";
+        } else if (info.badge === "14번 유형" || info.type.indexOf("과거/현재") >= 0) {
+          groupName = "compare";
+        } else if (info.badge === "15번 유형") {
+          groupName = "issue";
+        } else if (info.type.indexOf("경험") >= 0) {
+          groupName = "experience";
+        }
+
+        var seed = (displayTopicName(lesson).length + lesson.question.length + lesson.script.length) % 4;
+        var targetIndex = lesson.category === "Role Play" ? Math.min(1, lesson.script.length - 1) : Math.min(1 + (seed % 2), lesson.script.length - 1);
+        var nearbyHasStarter = hasNaturalStart(lesson.script[targetIndex - 1]) || hasNaturalStart(lesson.script[targetIndex + 1]);
+        if (!hasNaturalStart(lesson.script[targetIndex]) && !nearbyHasStarter) {
+          lesson.script[targetIndex] = withPrefix(starters[groupName][seed], lesson.script[targetIndex]);
+        }
+        lesson.script = lesson.script.map(softenFeeling);
+        lesson.memory = lesson.script.slice(0, 4);
+      });
+    }
+
     function lessonTypeInfo(lesson) {
       var topic = lowerText(lesson.originalTopic || lesson.topic);
       var question = lowerText(lesson.question);
@@ -4005,6 +4078,7 @@
     restoreRolePlayBookContent();
     restoreStandardQuestionContent();
     simplifyAllScriptsForIM3();
+    addLightFeelingWords();
     normalizeLessons();
     placePlaybackButtons();
     fillCategories();
