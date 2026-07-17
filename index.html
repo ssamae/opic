@@ -2913,6 +2913,134 @@
       }
     }
 
+    function restoreRolePlayBookContent() {
+      function updateLesson(match, data) {
+        for (var i = 0; i < lessons.length; i += 1) {
+          var lesson = lessons[i];
+          if (lesson.category !== "Role Play") continue;
+          var original = lesson.originalTopic || lesson.topic;
+          if (!match(original, lesson.question || "")) continue;
+          lesson.originalTopic = data.topic;
+          lesson.topic = data.topic;
+          lesson.question = data.question;
+          lesson.story = data.story;
+          lesson.script = data.script;
+          lesson.memory = data.script.slice(0, 4);
+          lesson.tips = data.tips;
+        }
+      }
+
+      function has(text) {
+        return function (topic) {
+          return String(topic).indexOf(text) >= 0;
+        };
+      }
+
+      updateLesson(has("Buying a Device"), {
+        topic: "전자기기 - 11번 유형 - MP3 구매 질문",
+        question: "I'd like to give you a situation and ask you to act it out. You want to buy an MP3 player. Call your friend and ask three or four questions about the MP3 player your friend uses.",
+        story: ["친구에게 MP3 플레이어에 대해 물어본다.", "나는 새 MP3 플레이어를 사려고 한다.", "친구가 쓰는 제품이 어떤지 궁금하다고 말한다.", "가격과 저장 공간을 물어본다.", "사용하기 쉬운지도 확인한다.", "배터리가 오래 가는지도 묻는다.", "어디서 샀는지도 물어본다.", "추천할 만한 제품인지 확인한다.", "마지막에는 답장을 부탁한다."],
+        script: ["Hi, this is Brian.", "I am thinking of buying an MP3 player.", "I know you have one, so I have some questions.", "What brand do you use?", "How much did you pay for it?", "Is it easy to use?", "How long does the battery last?", "Where did you buy it?", "Do you recommend it to me?", "Please call me back when you get this."],
+        tips: ["유형: 질문하기", "이북 지문 기준: MP3 플레이어 구매 상황이다.", "가격, 기능, 사용 편의성, 구매 장소를 묻는다.", "친구에게 답장을 부탁하며 마무리한다."]
+      });
+
+      updateLesson(has("Concert / Movie Ticket"), {
+        topic: "공연/영화 티켓 - 11번 유형 - 티켓 구매 질문",
+        question: "I'd like to give you a situation and ask you to act it out. You want to buy two tickets for a show or movie tonight. Call the ticket office and ask three or four questions about the tickets.",
+        story: ["티켓 사무실에 전화한다.", "오늘 밤 공연이나 영화를 보려고 한다.", "티켓 두 장이 필요한 상황이다.", "아직 좌석이 남아 있는지 묻는다.", "상영 시간이나 공연 시간을 확인한다.", "티켓 가격을 물어본다.", "좋은 좌석이 있는지도 묻는다.", "온라인 결제가 가능한지도 확인한다.", "마지막에는 예약 방법을 묻는다."],
+        script: ["Hello, I am calling about tickets for tonight.", "I would like to get two tickets.", "Are there any seats available?", "What time does the show start?", "How much are the tickets?", "Do you have good seats left?", "Can I reserve the tickets by phone?", "Can I pay online?", "Please let me know how I can buy them.", "Thank you."],
+        tips: ["유형: 질문하기", "이북 지문 기준: 오늘 밤 볼 티켓 두 장을 사는 상황이다.", "좌석, 시간, 가격, 예약 방법을 묻는다.", "질문은 짧게 3~4개 이상 이어간다."]
+      });
+
+      updateLesson(has("House Sitting Problem"), {
+        topic: "친척 집 봐주기 - 12번 유형 - 열쇠/문 문제 해결",
+        question: "I'd like to give you a situation and ask you to act it out. You are watching a relative's house, but you cannot get into the house because of a key problem. Call your relative, explain the situation, and ask for alternatives.",
+        story: ["친척 집을 봐주러 갔는데 문제가 생겼다.", "집에 들어가야 하는데 열쇠가 맞지 않는다고 말한다.", "혹시 열쇠를 어디에 두었는지 묻는다.", "여분의 열쇠가 있는지도 확인한다.", "이웃에게 다른 열쇠를 맡겼는지 묻는다.", "잠기지 않은 다른 문이 있는지도 물어본다.", "어떻게 해야 할지 모르겠다고 말한다.", "마지막에는 메시지를 받으면 전화해 달라고 한다."],
+        script: ["Hi, I am at your house now.", "I am sorry, but there is a problem.", "I cannot get into the house because the key does not work.", "Can you tell me where you put the key?", "Do you have a spare key somewhere?", "Did you leave another key with your neighbor?", "If not, is there any door that is not locked?", "I am not sure what to do.", "Please give me a call when you get this.", "Thank you."],
+        tips: ["유형: 문제 해결", "이북 지문 기준: 친척 집을 봐주는 중 열쇠/출입 문제가 생긴 상황이다.", "문제 설명 후 열쇠 위치, 여분 열쇠, 이웃, 다른 문을 차례로 묻는다.", "마지막에 전화 요청으로 닫는다."]
+      });
+
+      updateLesson(function (topic) { return topic.indexOf("Shopping Problem") >= 0 || topic.indexOf("쇼핑 - 12") >= 0; }, {
+        topic: "쇼핑 - 12번 유형 - 옷 문제 해결",
+        question: "I'm sorry, but there is a problem I need you to resolve. The clothes you ordered have arrived, but one of the shirts has a problem. Call the clothing store, explain the problem, and give two or three alternatives to solve it.",
+        story: ["옷가게에서 산 옷에 문제가 생겼다.", "새 셔츠를 받았는데 문제가 있다고 말한다.", "단추 하나가 빠져 있다고 설명한다.", "왼쪽 소매에 얼룩이 있다고 말한다.", "주문한 것과 다른 상품일 수도 있다고 말한다.", "셔츠 때문에 매우 불만이라고 말한다.", "교환을 받고 싶다고 요청한다.", "원하면 환불도 가능한지 묻는다.", "언제 매장에 방문하면 좋은지 확인한다.", "마지막에는 답장을 부탁한다."],
+        script: ["Hi, this is a person who bought some clothes at your store.", "However, there is a problem with the shirt I got.", "There is a button missing.", "Also, there is a stain on the left sleeve.", "This is not the one I ordered.", "I think there was a mistake.", "I am very unhappy with the shirt.", "I would like to get an exchange.", "Could I get a refund if I want to?", "When is a good time to visit your store?"],
+        tips: ["유형: 문제 해결", "이북 지문 기준: 셔츠 문제를 구체적으로 설명한다.", "단추, 얼룩, 주문과 다름을 말한다.", "교환/환불과 방문 시간을 묻는다."]
+      });
+
+      updateLesson(function (topic) { return topic.indexOf("쇼핑 - 11") >= 0; }, {
+        topic: "쇼핑 - 11번 유형 - 옷 구매 질문",
+        question: "I'd like to give you a situation and ask you to act it out. You are at a clothing store and need to get some clothes. Ask two or three questions about the clothes you would like to buy.",
+        story: ["옷가게에서 옷을 사려고 한다.", "새 셔츠나 정장을 사고 싶다고 말한다.", "여행이나 일 때문에 티셔츠가 필요할 수 있다.", "어떤 종류의 셔츠가 있는지 묻는다.", "가격이 얼마인지 확인한다.", "할인이나 행사 중인지 묻는다.", "좋은 상품을 추천해 달라고 말한다.", "도움이 필요하다고 정중하게 말한다."],
+        script: ["Excuse me.", "I would like to buy a new shirt.", "I am going on a vacation, so I need to buy some T-shirts.", "What kinds of shirts are available?", "Can you tell me how much they are?", "Are there any discounts or promotions going on?", "I want to get a good deal.", "Can you recommend something for me?", "I think I need some help."],
+        tips: ["유형: 질문하기", "이북 지문 기준: 옷가게에서 구매 질문을 하는 상황이다.", "종류, 가격, 할인, 추천을 묻는다."]
+      });
+
+      updateLesson(has("Hotel Reservation"), {
+        topic: "호텔 - 11번 유형 - 도시 투어 질문",
+        question: "I'd like to give you a situation and ask you to act it out. You are staying at a hotel and have a free day to explore the city. Go to the front desk and ask three or four questions about what to do.",
+        story: ["호텔에 머무는 중 하루 자유 시간이 생겼다.", "프런트에 가서 할 만한 것을 물어본다.", "도시를 둘러볼 수 있는 투어에 관심이 있다고 말한다.", "아침에 출발하고 싶다고 말한다.", "어떤 투어가 가능한지 묻는다.", "투어 가격을 확인한다.", "추천할 만한 투어가 있는지 묻는다.", "볼 수 있는 웹사이트가 있는지도 확인한다.", "현재 진행 중인 행사나 할인이 있는지도 묻는다."],
+        script: ["Excuse me, I would like to inquire about something I can do.", "I have a free day to explore the city.", "I am thinking of going on a tour.", "I would like to leave in the morning.", "What kinds of tours are available?", "What are the rates for the tours?", "Can you give me any recommendations?", "Do you have a website I can see?", "Do you have any promotions going on currently?"],
+        tips: ["유형: 질문하기", "이북 지문 기준: 호텔 프런트에서 도시 투어를 문의한다.", "투어 종류, 가격, 추천, 웹사이트, 프로모션을 묻는다."]
+      });
+
+      updateLesson(function (topic) { return topic.indexOf("호텔 예약 - 12") >= 0; }, {
+        topic: "호텔 - 12번 유형 - 택시 분실물 문제",
+        question: "I'm sorry, but there is a problem I need you to resolve. You left your bag in the taxi that brought you back to the hotel. Call the taxi company, explain what happened, describe your bag, and ask how you can get it back.",
+        story: ["호텔로 돌아오는 택시에 가방을 두고 내렸다.", "택시 회사에 전화해서 도움을 요청한다.", "택시 승객이었다고 말한다.", "가방을 택시에 두고 내린 것 같다고 설명한다.", "가방은 검은색 가죽 가방이라고 묘사한다.", "약 30분 전에 택시를 탔다고 말한다.", "택시 기사가 가방을 가지고 있는지 확인해 달라고 한다.", "어떻게 돌려받을 수 있는지 묻는다.", "가능한 빨리 연락 달라고 부탁한다."],
+        script: ["Hi there. I am a passenger who took one of your taxis.", "I am calling to ask for some help.", "I am afraid that I left my bag behind in the taxi.", "It is a black leather bag.", "I took the taxi about half an hour ago.", "Can you check if the driver found my bag?", "If you have it, how can I get it back?", "Can I visit your office to pick it up?", "Please let me know as soon as possible.", "Thank you."],
+        tips: ["유형: 문제 해결", "이북 지문 기준: 호텔로 돌아온 택시에 가방을 두고 내린 상황이다.", "분실 상황, 가방 묘사, 택시 이용 시간, 회수 방법을 말한다."]
+      });
+
+      updateLesson(has("Gathering / Party"), {
+        topic: "모임/파티 - 11번 유형 - 생일파티 장소 질문",
+        question: "I'd like to give you a situation and ask you to act it out. You have been invited to a friend's birthday party. The party will be held at a bar. Call your friend and ask three or four questions about the place.",
+        story: ["친구 생일파티에 초대받았다.", "파티는 술집에서 열린다.", "친구에게 전화해서 장소에 대해 묻는다.", "먼저 생일을 축하하고 초대해 줘서 고맙다고 말한다.", "가는 길을 알려 달라고 한다.", "차를 가져가도 되는지 묻는다.", "주차가 가능한지도 확인한다.", "지하철역에서 걸어갈 수 있는 거리인지 묻는다.", "파티 시작 시간과 마실 음료도 확인한다."],
+        script: ["Hi, John. This is Brian.", "Happy birthday, and thanks for inviting me to your party.", "I have some questions about the place.", "Can you give me some directions?", "Should I bring my car or not?", "Do you think I can park there?", "If not, I will just take the subway.", "Is it within walking distance from a subway station?", "What time does the party start?", "What types of drinks are we having?"],
+        tips: ["유형: 질문하기", "이북 지문 기준: 술집에서 열리는 생일파티 장소 질문이다.", "길, 차/주차, 지하철 거리, 시작 시간, 음료를 묻는다."]
+      });
+
+      updateLesson(function (topic) { return topic.indexOf("모임/파티 - 12") >= 0; }, {
+        topic: "모임/파티 - 12번 유형 - 파티 불참 문제",
+        question: "I'm sorry, but there is a problem I need you to resolve. You have a test coming up tomorrow and cannot make it to your friend's birthday party. Call your friend, explain the situation, and give two or three alternatives.",
+        story: ["친구 생일파티에 갈 수 없게 되었다.", "내일 시험이 있어서 준비해야 한다고 말한다.", "파티에 정말 가고 싶었지만 갈 수 없다고 설명한다.", "그 시험이 매우 중요해서 어쩔 수 없다고 말한다.", "진심으로 미안하다고 사과한다.", "시험이 끝난 뒤에 보상하겠다고 말한다.", "다음 주에 점심을 사겠다고 제안한다.", "그때 준비한 선물을 주겠다고 말한다."],
+        script: ["Hi, John. This is Brian.", "I am so sorry, but I have some bad news.", "I do not think I can make it to your birthday party tomorrow.", "I actually have a test coming up, and I have to prepare for it.", "I was really looking forward to going to your party.", "However, this test is very important, and there is nothing I can do.", "I am really sorry.", "I will make it up to you after the test.", "Why don't I take you out for lunch next week?", "I will give you your gift when we have lunch."],
+        tips: ["유형: 문제 해결", "이북 지문 기준: 시험 때문에 생일파티에 못 가는 상황이다.", "사과, 이유 설명, 대안 제시를 순서대로 말한다."]
+      });
+
+      updateLesson(has("Real Estate"), {
+        topic: "부동산 - 11번 유형 - 집 구하기 질문",
+        question: "I'd like to give you a situation and ask you to act it out. You would like to get a house. Call a real estate agent, explain what kind of house you want, and ask three or four questions about the home and services.",
+        story: ["집을 구하려고 부동산에 전화한다.", "살 집을 알아보고 있다고 말한다.", "도심에 있는 방 세 개짜리 집을 생각하고 있다고 설명한다.", "어떤 집들이 있는지 묻는다.", "지하철역에서 걸어갈 수 있는 곳을 원한다고 말한다.", "주차 공간이 충분하면 좋겠다고 말한다.", "추천할 만한 집이 있는지 묻는다.", "평균 월세가 얼마인지 확인한다.", "언제 집을 볼 수 있는지도 묻는다."],
+        script: ["Hi, there.", "I am calling to inquire about renting a house to live in.", "I am thinking of a three-bedroom house in a downtown area.", "What kinds of houses do you have?", "I would like to get a place within walking distance from a subway station.", "I also want it with plenty of parking spaces.", "Can you recommend something for me?", "How much is the average rent?", "When can I see the house?", "Please let me know."],
+        tips: ["유형: 질문하기", "이북 지문 기준: 부동산에 전화해서 원하는 집 조건을 설명한다.", "집 종류, 위치, 주차, 월세, 방문 가능 시간을 묻는다."]
+      });
+
+      updateLesson(has("Travel Agency"), {
+        topic: "여행사 - 11번 유형 - 여행 상품 질문",
+        question: "I'd like to give you a situation and ask you to act it out. You are planning to go on a trip. Call a travel agency and ask three or four questions about a travel package.",
+        story: ["여행을 계획하고 여행사에 전화한다.", "여행 상품에 대해 문의한다고 말한다.", "가고 싶은 지역이나 날짜를 말한다.", "어떤 패키지가 있는지 묻는다.", "가격이 얼마인지 확인한다.", "항공과 호텔이 포함되는지 묻는다.", "방문하는 장소를 확인한다.", "일정이 너무 바쁜지도 묻는다.", "취소 규정도 확인한다.", "자세한 정보를 보내 달라고 한다."],
+        script: ["Hello, I am calling about a travel package.", "I am planning to go on a trip.", "What kinds of packages do you have?", "How much is the package?", "Are flights and hotels included?", "What places will we visit?", "Is the schedule too busy?", "How can I make a reservation?", "What is the cancellation policy?", "Please send me more details."],
+        tips: ["유형: 질문하기", "이북 지문 기준: 여행사에 여행 상품을 문의한다.", "패키지 종류, 가격, 포함 사항, 일정, 취소 규정을 묻는다."]
+      });
+
+      updateLesson(has("Rental Car"), {
+        topic: "렌터카 - 11번 유형 - 렌터카 질문",
+        question: "I'd like to give you a situation and ask you to act it out. You are on vacation and need to rent a car. Call a rental car company and ask three or four questions about renting a car.",
+        story: ["휴가 중 차를 빌리려고 한다.", "렌터카 회사에 전화한다.", "차가 필요한 날짜를 말한다.", "사용 가능한 차가 있는지 묻는다.", "하루 가격을 확인한다.", "보험이 포함되는지 묻는다.", "어디서 차를 받을 수 있는지 확인한다.", "반납 장소와 시간을 묻는다.", "필요한 서류도 확인한다."],
+        script: ["Hello, I would like to rent a car.", "I am on vacation, and I need a car.", "Do you have any cars available this weekend?", "How much is it per day?", "Is insurance included?", "Where can I pick up the car?", "Where can I return it?", "What time should I return it?", "What documents do I need?", "Please give me more information."],
+        tips: ["유형: 질문하기", "이북 지문 기준: 휴가 중 렌터카를 빌리는 상황이다.", "가능 여부, 가격, 보험, 픽업/반납, 서류를 묻는다."]
+      });
+
+      updateLesson(has("Bank / Card"), {
+        topic: "은행/카드 - 12번 유형 - 식당에 두고 온 카드",
+        question: "I'm sorry, but there is a problem I need you to resolve. You left your credit card behind at a restaurant you ate at. Call the restaurant, explain your situation, and give several alternatives to solve the problem.",
+        story: ["식당에 신용카드를 두고 왔다.", "식당에 전화해서 도움을 요청한다.", "어젯밤 그 식당에 갔던 손님이라고 말한다.", "카드를 식당에 두고 온 것 같다고 설명한다.", "카드는 검은색이고 뒷면에 서명이 있다고 말한다.", "카드를 보관하고 있는지 확인해 달라고 한다.", "있다면 집에 가는 길에 들르겠다고 말한다.", "언제 방문하면 좋은지 묻는다.", "몇 시까지 영업하는지도 확인한다.", "가능한 빨리 알려 달라고 부탁한다."],
+        script: ["Hi, there.", "This is a person who went to your restaurant last night.", "I am calling to ask for some help.", "I am afraid that I left my credit card behind at your restaurant.", "It is a black card, and it has my signature on the back.", "Can you please check if you have my card?", "If so, I will drop by on my way home.", "Can you tell me when I can visit your restaurant?", "Until when are you open?", "Please let me know as soon as possible."],
+        tips: ["유형: 문제 해결", "이북 지문 기준: 은행 전화가 아니라 식당에 두고 온 카드 문제다.", "카드 특징, 보관 여부, 방문 가능 시간, 연락 요청을 말한다."]
+      });
+    }
+
     function lessonTypeInfo(lesson) {
       var topic = lowerText(lesson.originalTopic || lesson.topic);
       var question = lowerText(lesson.question);
@@ -3675,6 +3803,7 @@
 
     polishLessonsForIM3();
     nojamRewriteAll();
+    restoreRolePlayBookContent();
     normalizeLessons();
     placePlaybackButtons();
     fillCategories();
